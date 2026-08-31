@@ -1,0 +1,7 @@
+# Inputs and intermediates are fetched with download_data.py, never committed.
+# The connectome files are 1.3 GB and belong to Rosen & Halgren (CC-BY 4.0).
+data/
+
+__pycache__/
+*.pyc
+.DS_Store
