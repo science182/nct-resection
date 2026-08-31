@@ -104,7 +104,7 @@ average, unthresholded to match Lin et al. 2024, whose methods state the
 matrices were "not binarized or thresholded" (`run_real.py`, ~2 min).
 
 The headline comparison looks encouraging: Spearman(d_ave_control,
-d_global_eff) = +0.559, with 20 of 36 parcels in each metric's worst decile
+d_global_eff) = +0.529, with 19 of 36 parcels in each metric's worst decile
 missed by the other. That is exactly the disagreement the project is looking
 for.
 
@@ -161,7 +161,7 @@ bilateral activation of each of the ten networks, from a zero initial state,
 horizon 10, resections applied by disconnecting.
 
 The first pass looked like a success: extra energy correlated with strength at
-only +0.179 against average controllability's +0.909, and the rankings were
+only +0.179 against average controllability's +0.903, and the rankings were
 target-specific (median cross-network rank agreement +0.075), which is exactly
 the per-function risk score the project wants. It was noise.
 
@@ -262,7 +262,7 @@ over 24 individual connectomes (`run_subject_deletions.py`, 9.4 hours):
 
 Individual data does not rescue the resection claim. Deletion-delta
 controllability tracks strength at +0.892 within subject, essentially unchanged
-from +0.909 on the group average. It produces no more individual variation in
+from +0.903 on the group average. It produces no more individual variation in
 which parcel is worst than global efficiency or degree do. The
 individual-specific component is +0.039, which is negligible.
 
