@@ -113,14 +113,19 @@ controllability tracks weighted degree, so node strength is the baseline any
 claim here has to beat:
 
     measure            vs strength    partial vs d_global_eff | strength
-    d_ave_control        +0.909            +0.158
+    d_ave_control        +0.903            +0.077
     d_mod_control        -0.483            -0.259
     d_global_eff         +0.555             --
     pagerank             +0.997            -0.195
 
-Average controllability's resection ranking is 91 percent explained by summing
+(These are the values the shipped code reproduces at the default normalization
+radius of 0.95. An earlier draft of this file quoted +0.909 and +0.158, computed
+before the default was changed away from 0.9999 for the reason given under the
+Units trap below. The conclusion is unchanged.)
+
+Average controllability's resection ranking is 90 percent explained by summing
 a row of the connectivity matrix, and once strength is partialled out its
-relationship to global efficiency damage falls from +0.559 to +0.158. Worse,
+relationship to global efficiency damage falls from +0.529 to +0.077. Worse,
 the parcels it flags that global efficiency misses have a median strength rank
 of 29 out of 360, against 116 for the parcels global efficiency flags alone. So
 "controllability finds what efficiency misses" is, at this level, "controllability
