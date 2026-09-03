@@ -42,6 +42,71 @@ Seven separate results in this project looked clean and significant and were
 wrong. Each is documented below with the control that caught it. That record is
 the main thing worth taking from this repo.
 
+## What is new here, and what is not
+
+Most of this replicates known results. Being clear about that up front:
+
+**Not new.** Average controllability tracks node strength. Gu et al. (2015)
+report r = 0.91; the +0.896 measured here reproduces it. That edge weighting
+changes graph metrics is also well established, with its own reproducibility
+literature. Multiverse analysis is an established methodology, including in
+network neuroscience via the Comet toolbox.
+
+**A rebuttal this project has to answer.** Parkes et al. argue the
+strength correlation is *spatial*, across the brain, and does not imply
+redundancy *between subjects*: average controllability outperformed strength at
+out-of-sample prediction of psychosis symptoms. Every analysis here is spatial,
+which is exactly the axis where the correlation is conceded to be high. The
+reply is that for a surgical planning map the spatial axis is the relevant one,
+since a surgeon chooses a location rather than a patient, but that argument has
+to be made rather than assumed. Nothing here contradicts the between-subject
+case for controllability.
+
+**What does appear to be untested.** The network control theory protocol paper
+names this exact concern as a limitation without measuring it: "the distribution
+of edge weights can vary significantly across different pre-processing
+pipelines, which implies equally significant variations in the strength of
+interactions between regions." The Comet toolbox, which exists to run multiverse
+analyses in network neuroscience, does not include controllability measures and
+targets functional rather than structural connectivity. Virtual resection with
+control measures exists (Khambhati et al. 2016 on synchronizability, Janson et
+al. 2024 on controllability after temporal lobe resection), but without
+weighting-sensitivity analysis.
+
+So the contribution is narrow and specific: a quantitative demonstration of a
+stated but untested limitation, in the lesion and resection setting that
+existing multiverse tooling does not cover. Two conventions, mutually exclusive
+enrichments, each surviving a spin test and Bonferroni correction and each
+reproducing at +0.999 across independent halves. That is confirmation with
+numbers attached, not a discovery, and it should be described that way.
+
+**Testing the rebuttal directly** (`run_axes.py`). Both weightings run on the
+same 1065 subjects in verified identical order, compared along both axes:
+
+    agreement between Fpt and streamline    spatial   between-subject
+      raw damage (d_ac)                      +0.394       +0.451
+      degree-corrected damage                +0.021       +0.059
+      node strength                          +0.870       +0.729
+      subject-shuffled null                                -0.008 (sd 0.031)
+
+Both axes collapse for the degree-corrected measure. Between-subject agreement
+of +0.059 sits barely above a shuffled null and is not even consistent in sign:
+149 of 360 parcels are negative, sd 0.310, spanning -0.765 to +0.799.
+
+Node strength, by contrast, is stable on both axes, and raw damage is moderately
+stable. The pattern is coherent: the degree component of resection damage
+survives a change of convention and everything beyond degree does not, whichever
+way the data is sliced. The only dependable signal in these measures is the one
+that does not require controllability to compute.
+
+The limit of this test: Parkes et al.'s claim was that average controllability
+*predicts* an external variable between subjects better than strength does.
+That is not what is measured here, which is whether the values themselves
+survive a change of weighting. The two are different claims and this one does
+not refute theirs. It does show that their defence does not rescue this
+application, and it suggests that any surviving between-subject signal would
+have to ride on the degree component, which is the part that stays stable.
+
 ## Running it
 
 ```bash
