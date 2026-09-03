@@ -309,6 +309,28 @@ statistically robust, anatomically plausible result that is nonetheless
 determined by a preprocessing convention. More subjects make it look more
 convincing, not less.
 
+**The contradiction at full scale.** Both weightings run on all 1065 subjects,
+from the same tractography, differing only in convention:
+
+                            Fpt              raw streamline counts
+    Language            9/36  p = 0.0050      0/36  p = 1.00
+    Visual              0/36  p = 1.00       25/36  p = 0.0080
+    split-half agreement       +0.999               +0.999
+    d_ac vs strength           +0.896               +0.689
+
+    agreement between the two degree-corrected maps:  +0.021
+
+Each map is essentially perfectly reproducible across independent halves of
+more than 500 subjects. Each produces an enrichment that survives a spin test
+and Bonferroni correction. They are orthogonal to each other, and they are
+mutually exclusive: the weighting that finds language finds no visual effect at
+all, and the weighting that finds visual finds no language effect at all.
+
+Neither is underpowered. Neither is a fluke. Both are wrong, or at least neither
+can be believed on its own, and no amount of the usual rigour distinguishes
+them. Only changing the edge weighting exposes it, and edge weighting is a
+choice that most papers report in a single clause of the methods section.
+
 ## The language result does not replicate across weightings
 
 The section below describes a degree-corrected controllability score that
