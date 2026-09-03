@@ -281,7 +281,35 @@ exposed it, since strength profiles are reliably identifiable in the literature.
 Genuine fingerprinting needs two sessions per subject, which this data does not
 have. Keep a known-positive control in any test of this kind.
 
-## READ THIS FIRST: the language result does not replicate
+## At full scale (n = 1065): the artifact is robust, which is worse
+
+The per-subject results below were computed on 24 subjects because the sweep
+cost 9.4 hours. `run_scale.py` reduced that by about 90x, so the same analysis
+now runs on all 1065 subjects (6.2 hours, results identical to 2.75e-12 against
+the original run). Scaling up did not weaken the language finding. It
+strengthened it:
+
+    within-subject Spearman(d_ac, strength)   +0.896  sd 0.018   (was +0.892)
+    within-subject Spearman(d_ge, strength)   +0.539  sd 0.029
+    Language in top 36                        9, spin p = 0.0050  (was 8, p = 0.011)
+
+    independent split, 532 vs 533 subjects
+      half A   Language 9/36, spin p = 0.0050
+      half B   Language 9/36, spin p = 0.0050
+      map agreement between halves        +0.999
+
+So the language map now clears Bonferroni across ten networks and replicates
+exactly across two independent halves of more than 500 subjects each. It is
+still an artifact of the edge weighting, because streamline weighting gives 0
+of 36 and visual cortex instead.
+
+That combination is the real lesson of this repository. The failure mode is not
+an underpowered fluke that more data washes away. It is a highly reproducible,
+statistically robust, anatomically plausible result that is nonetheless
+determined by a preprocessing convention. More subjects make it look more
+convincing, not less.
+
+## The language result does not replicate across weightings
 
 The section below describes a degree-corrected controllability score that
 concentrates on language cortex. It survived a spin test, four different degree
