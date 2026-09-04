@@ -107,6 +107,43 @@ not refute theirs. It does show that their defence does not rescue this
 application, and it suggests that any surviving between-subject signal would
 have to ride on the degree component, which is the part that stays stable.
 
+## Independent replication: the degree result holds, the weighting result does not
+
+Everything above uses one dataset, which makes it a statement about one
+tractography pipeline. `run_lausanne.py` repeats the core tests in a second
+dataset that differs on every axis: 70 subjects rather than 1065, a different
+site and acquisition, Connectome Mapper rather than probtrackx, the Lausanne 219
+atlas rather than HCP-MMP1 360, fiber density rather than fractional probability
+as the edge weight, and 11 percent density rather than fully dense
+(Zenodo 2872624, CC-BY 4.0).
+
+    measure                              HCP        Lausanne 219
+    d_ac vs strength, within subject    +0.896        +0.883      replicates
+    degree-corrected map stability      +0.289        +0.756      does NOT
+    node strength map stability         +0.748        +0.834
+
+**The degree confound replicates cleanly.** Controllability damage tracks node
+strength at +0.883 here against +0.896 in HCP, in a completely different
+pipeline and parcellation. That is the robust finding in this project, and it is
+also the finding that was already known.
+
+**The weighting instability does not replicate.** In the Lausanne connectomes
+the degree-corrected map is reasonably stable across the four conventions,
++0.756, where in HCP it collapsed to +0.289. So the headline claim above is not
+a general property of network control measures. It is at least partly a property
+of the connectomes it was measured on.
+
+The obvious candidate is the structural difference between the two datasets. HCP
+probtrackx output is fully dense with edge weights spanning about 250,000 to 1,
+while the Lausanne matrices are 11 percent dense spanning about 20,000 to 1. The
+instability may be confined to dense, extremely heavy-tailed connectomes.
+
+One caveat on the comparison: the Lausanne release ships a single native
+weighting, so all four conventions there are derived from it. The HCP figure
+used for comparison (+0.289) is the matching derived-weighting number, not the
+Fpt-against-streamline-counts comparison, so this is like for like. The native
+two-weighting test could not be run in the second dataset.
+
 ## Running it
 
 ```bash
