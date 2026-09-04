@@ -135,8 +135,35 @@ of the connectomes it was measured on.
 
 The obvious candidate is the structural difference between the two datasets. HCP
 probtrackx output is fully dense with edge weights spanning about 250,000 to 1,
-while the Lausanne matrices are 11 percent dense spanning about 20,000 to 1. The
-instability may be confined to dense, extremely heavy-tailed connectomes.
+while the Lausanne matrices are 11 percent dense spanning about 20,000 to 1.
+
+**Density explains most of it** (`run_density.py`). Thinning the HCP connectomes
+toward Lausanne's density recovers most of the stability, monotonically:
+
+    HCP edges kept    density    degree-corrected map stability
+      100%             1.00              +0.261
+       50%             0.50              +0.262
+       30%             0.30              +0.409
+       11%             0.11              +0.594
+    Lausanne 219       0.11              +0.756
+
+So the instability is a property of dense connectomes rather than of
+controllability. The residual gap between +0.594 and +0.756 is presumably the
+other pipeline differences: parcellation, tractography algorithm, and how the
+edge weight is defined.
+
+This makes the claim narrower and more useful at the same time, because it comes
+with a condition and a remedy. On a fully dense probabilistic connectome, the
+degree-corrected resection map depends heavily on the weighting convention.
+Thresholding to a typical sparse density largely removes that dependence.
+
+It also lands squarely on the design being replicated here: Lin et al. state
+their matrices were "not binarized or thresholded", which is the regime where
+this problem is worst. That is a concrete, checkable methodological caution
+rather than a general complaint about network control theory.
+
+Caveat: the density sweep used 12 subjects per condition, enough to estimate a
+map correlation but not a precise one.
 
 One caveat on the comparison: the Lausanne release ships a single native
 weighting, so all four conventions there are derived from it. The HCP figure
