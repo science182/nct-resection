@@ -137,7 +137,47 @@ The obvious candidate is the structural difference between the two datasets. HCP
 probtrackx output is fully dense with edge weights spanning about 250,000 to 1,
 while the Lausanne matrices are 11 percent dense spanning about 20,000 to 1.
 
-**Density explains most of it** (`run_density.py`). Thinning the HCP connectomes
+**Correction: it is the weight distribution, not density** (`run_mechanism.py`).
+The density sweep below was confounded. Thresholding removes edges *and*
+discards the smallest weights, so every point in it moved both knobs at once.
+Separating them on a grid, by raising weights to a power alpha (which compresses
+the tail without removing any edge) and thinning independently:
+
+    alpha  density   tail max/median   map stability
+     1.00    1.00         8748            +0.319
+     1.00    0.30          899            +0.464
+     1.00    0.11          193            +0.638
+     0.50    1.00           94            +0.629
+     0.50    0.30           30            +0.688
+     0.50    0.11           14            +0.766
+     0.25    1.00           10            +0.843
+     0.25    0.30            5            +0.781
+     0.25    0.11            4            +0.772
+
+    compressing the tail at fixed density   +0.523, +0.317, +0.134
+    thinning at fixed tail                  +0.319, +0.136, -0.070
+
+    Spearman(log tail ratio, stability)     -0.917
+    Spearman(density, stability)            -0.211
+    partial(density, stability | log tail)  +0.267
+
+Tail heaviness accounts for nearly all of it. Compressing the tail at full
+density lifts stability from +0.319 to +0.843, better than the Lausanne dataset
+manages. Thinning at an already-compressed tail does nothing (-0.070). Cells
+with matched tail ratios but very different densities land in the same place:
+tail 193 at density 0.11 gives +0.638, tail 94 at density 1.00 gives +0.629.
+
+**This changes the recommendation.** Thresholding is not the fix, it is a side
+effect that happens to compress the tail while throwing away 89 percent of the
+edges to get there. Compressing the weight distribution directly, by a log or
+power transform, keeps every edge and produces a more stable map than
+thresholding does. If you are running control measures on a dense probabilistic
+connectome, transform the weights rather than thinning the graph.
+
+The density sweep is kept below for the record, and because it is what motivated
+the grid, but its causal reading was wrong.
+
+**Density sweep, superseded** (`run_density.py`). Thinning the HCP connectomes
 toward Lausanne's density recovers most of the stability, monotonically:
 
     HCP edges kept    density    degree-corrected map stability
@@ -147,15 +187,17 @@ toward Lausanne's density recovers most of the stability, monotonically:
        11%             0.11              +0.594
     Lausanne 219       0.11              +0.756
 
-So the instability is a property of dense connectomes rather than of
-controllability. The residual gap between +0.594 and +0.756 is presumably the
-other pipeline differences: parcellation, tractography algorithm, and how the
-edge weight is defined.
+Read at the time as density being the cause. The grid above shows that reading
+was wrong: thinning helps only because it compresses the weight distribution on
+the way. The residual gap between +0.594 and +0.756 is presumably the other
+pipeline differences: parcellation, tractography algorithm, and edge-weight
+definition.
 
-This makes the claim narrower and more useful at the same time, because it comes
-with a condition and a remedy. On a fully dense probabilistic connectome, the
-degree-corrected resection map depends heavily on the weighting convention.
-Thresholding to a typical sparse density largely removes that dependence.
+The claim that survives is narrower and more useful than the original, because
+it comes with a condition and a remedy. On a connectome with a very heavy edge
+weight distribution, the degree-corrected resection map depends heavily on the
+weighting convention. Compressing that distribution largely removes the
+dependence.
 
 It also lands squarely on the design being replicated here: Lin et al. state
 their matrices were "not binarized or thresholded", which is the regime where
