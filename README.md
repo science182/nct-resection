@@ -39,7 +39,14 @@ read that as raw pipelines being safe. Counting conclusions rather than
 correlations shows otherwise: even for raw deletion damage the top hub changes
 in 83 percent of weighting comparisons, top-10 sets overlap only 54 percent, and
 the most over-represented network changes in 83 percent. Degree correction makes
-this worse rather than causing it. See `run_fliprate.py`.
+this worse rather than causing it.
+
+Comparing the two *native* weightings, Fpt against raw streamline counts on the
+same 1065 brains, is stronger still: 43 percent top-10 overlap and 29.6 percent
+of clear-cut pairwise calls reversing for raw damage, and 0 percent overlap with
+47.6 percent reversing once degree-corrected. Both are measurements people
+publish, so this is not an artifact of inventing conventions. See
+`run_fliprate.py`.
 
 **Control energy** was the remaining candidate and does not work as formulated:
 no sensitivity with full control, an ill-conditioned Gramian with restricted

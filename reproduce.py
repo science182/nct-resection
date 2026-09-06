@@ -220,6 +220,44 @@ def _f6():
     return _flip("data/lausanne_deletions.npz", False, "flip")
 
 
+def _native(field, corrected):
+    from run_fliprate import conclusions
+    f = np.load("data/scale_fpt_deletions.npz")
+    s_ = np.load("data/scale_streamline_deletions.npz")
+    if corrected:
+        mf = residualize(f["d_ac"], f["strength"], "quadratic").mean(0)
+        ms = residualize(s_["d_ac"], s_["strength"], "quadratic").mean(0)
+    else:
+        mf, ms = f["d_ac"].mean(0), s_["d_ac"].mean(0)
+    rng = np.random.default_rng(0)
+    r = conclusions({"a": mf, "b": ms}, ["a", "b"], rng)[0]
+    return r["top10_jaccard"] if field == "top10" else r["pair_flip_clear"]
+
+
+@claim("native Fpt vs streamline, raw: top-10 overlap", 0.43, 0.02,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _n1():
+    return _native("top10", False)
+
+
+@claim("native Fpt vs streamline, raw: clear-cut flips", 0.296, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _n2():
+    return _native("flip", False)
+
+
+@claim("native Fpt vs streamline, corrected: top-10 overlap", 0.0, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _n3():
+    return _native("top10", True)
+
+
+@claim("native Fpt vs streamline, corrected: clear-cut flips", 0.476, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _n4():
+    return _native("flip", True)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)

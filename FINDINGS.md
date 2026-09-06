@@ -143,6 +143,25 @@ each changes when only the weighting changes (`run_fliprate.py`):
                                     top-10 overlap             38%
                                     clear-cut pairwise flips   13.0%
 
+Those four conventions are derived from one matrix, and it is fair to object
+that nobody binarizes a connectome in practice. The same comparison between the
+two *native* weightings, Fpt against raw streamline counts, on the same 1065
+brains, is stronger still:
+
+    native pair, raw deletion damage    top-10 overlap             43%
+                                        clear-cut pairwise flips   29.6%
+                                        top hub, dominant network  both differ
+
+    native pair, degree-corrected       top-10 overlap              0%
+                                        clear-cut pairwise flips   47.6%
+                                        top hub, dominant network  both differ
+
+Degree-corrected, the ten highest-risk parcels under the two weightings are
+completely disjoint, and a clear-cut pairwise call is as likely to reverse as
+not. Both of these are measurements people publish; neither is invented for
+this test. Note that a single pair gives one observation for the binary
+outcomes, so "both differ" is one case rather than a rate.
+
 A Spearman of +0.58 sounds tolerable and coexists with the single most central
 parcel changing in five comparisons out of six, and with the most
 over-represented network changing just as often. Rank correlation is not the

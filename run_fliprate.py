@@ -137,6 +137,36 @@ def load_maps(path, corrected):
     return out
 
 
+def native_pair(rng, asg=None):
+    """The strongest version: two native weightings, not derived transforms.
+
+    The four conventions elsewhere are all derived from one matrix, and a
+    skeptic can fairly say nobody binarizes a connectome in practice. Fpt and
+    raw streamline counts are different measurements of the same 1065 brains,
+    and both are published routinely. If conclusions differ between these two,
+    the problem is not an artifact of inventing conventions.
+    """
+    fpt = "data/scale_fpt_deletions.npz"
+    stream = "data/scale_streamline_deletions.npz"
+    if not (os.path.exists(fpt) and os.path.exists(stream)):
+        print(f"\n  skipped native comparison: needs the full-scale sweeps")
+        return
+
+    f, s = np.load(fpt), np.load(stream)
+    for corrected in (False, True):
+        if corrected:
+            mf = residualize(f["d_ac"], f["strength"], "quadratic").mean(0)
+            ms = residualize(s["d_ac"], s["strength"], "quadratic").mean(0)
+            label = "degree-corrected"
+        else:
+            mf, ms = f["d_ac"].mean(0), s["d_ac"].mean(0)
+            label = "raw deletion damage"
+        rows = conclusions({"Fpt": mf, "streamline": ms},
+                           ["Fpt", "streamline"], rng, asg)
+        summarize(f"NATIVE weightings, HCP n=1065, {label}", rows,
+                  "Fpt against raw streamline counts, same brains")
+
+
 def main():
     rng = np.random.default_rng(0)
     try:
@@ -171,6 +201,8 @@ def main():
                   conclusions(cor, WEIGHTINGS, rng))
     else:
         print(f"\n  skipped Lausanne: {lau} not present")
+
+    native_pair(rng, asg)
 
     print("\n  Pairwise calls counted twice: over all random parcel pairs, and")
     print("  over 'clear-cut' pairs only, where the first map separates the two")
