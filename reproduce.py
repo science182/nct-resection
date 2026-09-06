@@ -163,6 +163,63 @@ def _hcp_stability():
     return float(np.mean(vals))
 
 
+# --- what the caution costs -------------------------------------------------
+# Deterministic: run_fliprate seeds its sampler, so these are exact.
+
+def _flip(path, corrected, field, use_networks=False):
+    from run_fliprate import conclusions, load_maps
+    from run_weightings import WEIGHTINGS
+    asg = None
+    if use_networks:
+        from run_energy import load_network_assignment
+        asg, _ = load_network_assignment()
+    rng = np.random.default_rng(0)
+    rows = conclusions(load_maps(path, corrected), WEIGHTINGS, rng, asg)
+    if field == "hub":
+        return 1.0 - float(np.mean([r["hub_same"] for r in rows]))
+    if field == "top10":
+        return float(np.mean([r["top10_jaccard"] for r in rows]))
+    if field == "flip":
+        return float(np.mean([r["pair_flip_clear"] for r in rows]))
+    return 1.0 - float(np.mean([r["net_same"] for r in rows]))
+
+
+@claim("HCP raw: top hub changes, fraction of weighting pairs", 0.833, 0.01,
+       needs=("data/weighting_deletions.npz",))
+def _f1():
+    return _flip("data/weighting_deletions.npz", False, "hub")
+
+
+@claim("HCP raw: mean top-10 overlap across weightings", 0.536, 0.01,
+       needs=("data/weighting_deletions.npz",))
+def _f2():
+    return _flip("data/weighting_deletions.npz", False, "top10")
+
+
+@claim("HCP raw: clear-cut pairwise calls that reverse", 0.211, 0.01,
+       needs=("data/weighting_deletions.npz",))
+def _f3():
+    return _flip("data/weighting_deletions.npz", False, "flip")
+
+
+@claim("HCP raw: dominant network changes, fraction of pairs", 0.833, 0.01,
+       needs=("data/weighting_deletions.npz",))
+def _f4():
+    return _flip("data/weighting_deletions.npz", False, "net", use_networks=True)
+
+
+@claim("HCP degree-corrected: clear-cut pairwise calls that reverse", 0.354, 0.01,
+       needs=("data/weighting_deletions.npz",))
+def _f5():
+    return _flip("data/weighting_deletions.npz", True, "flip")
+
+
+@claim("Lausanne raw: clear-cut pairwise calls that reverse", 0.075, 0.01,
+       needs=("data/lausanne_deletions.npz",))
+def _f6():
+    return _flip("data/lausanne_deletions.npz", False, "flip")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)

@@ -76,6 +76,16 @@ once the tail is already compressed does nothing.
 
 ![stability against tail heaviness](figures/fig3_mechanism.png)
 
+**4. What it costs.** Taking the kinds of statement papers actually make and
+counting how often each changes when only the weighting changes. Even for raw
+deletion damage, the measure as usually reported, the top hub changes in 83
+percent of comparisons and the most over-represented network changes just as
+often. Degree correction makes it worse. Note that this happens at a map
+correlation of +0.58, which is why reporting correlation in place of the
+conclusion understates how much is contingent.
+
+![how often conclusions flip](figures/fig4_fliprate.png)
+
 ## What is new here, and what is not
 
 Most of this replicates known results. Being clear about that up front:

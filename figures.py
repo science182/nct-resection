@@ -183,12 +183,75 @@ def fig_mechanism():
     print("  wrote fig3_mechanism.png")
 
 
+def fig_fliprate():
+    """How often the kinds of statement papers make change under reweighting."""
+    src = ("data/weighting_deletions.npz", "data/lausanne_deletions.npz")
+    if not have(*src):
+        return
+    from run_fliprate import conclusions, load_maps
+    from run_weightings import WEIGHTINGS
+    try:
+        from run_energy import load_network_assignment
+        asg, _ = load_network_assignment()
+    except Exception:
+        asg = None
+
+    conds = [
+        ("HCP\nraw", src[0], False, asg),
+        ("HCP\ndegree-corrected", src[0], True, asg),
+        ("Lausanne\nraw", src[1], False, None),
+        ("Lausanne\ndegree-corrected", src[1], True, None),
+    ]
+    stats = []
+    for label, path, corrected, a in conds:
+        rng = np.random.default_rng(0)
+        rows = conclusions(load_maps(path, corrected), WEIGHTINGS, rng, a)
+        stats.append({
+            "label": label,
+            "hub": 1 - np.mean([r["hub_same"] for r in rows]),
+            "top10": 1 - np.mean([r["top10_jaccard"] for r in rows]),
+            "flip": np.mean([r["pair_flip_clear"] for r in rows]),
+            "net": (1 - np.mean([r["net_same"] for r in rows])
+                    if "net_same" in rows[0] else np.nan),
+        })
+
+    fields = [("hub", "top hub changes"),
+              ("top10", "top-10 set differs"),
+              ("net", "dominant network changes"),
+              ("flip", "clear-cut pairwise calls reverse")]
+    colors = [ACCENT, "#e08a2e", "#7b4ea8", COOL]
+
+    fig, ax = plt.subplots(figsize=(9, 3.9))
+    x = np.arange(len(stats))
+    w = 0.2
+    for k, ((key, name), col) in enumerate(zip(fields, colors)):
+        vals = [s[key] for s in stats]
+        ax.bar(x + (k - 1.5) * w, vals, w, label=name, color=col)
+    ax.set_xticks(x)
+    ax.set_xticklabels([s["label"] for s in stats], fontsize=8)
+    ax.set_ylabel("fraction of weighting comparisons\nin which the conclusion changes")
+    ax.set_ylim(0, 1.05)
+    ax.axhline(0.5, color=GREY, ls=":", lw=1)
+    ax.legend(frameon=False, fontsize=7.5, ncol=2, loc="upper right")
+    ax.set_title("What the weighting choice costs: how often a published-style "
+                 "conclusion flips", fontsize=10)
+    style(ax)
+    fig.text(0.01, -0.04, "Missing bars are networks not labelled in the "
+                          "Lausanne atlas. Dotted line marks one half.",
+             fontsize=7, color=GREY)
+    fig.tight_layout()
+    fig.savefig(f"{OUT}/fig4_fliprate.png", dpi=170, bbox_inches="tight")
+    plt.close(fig)
+    print("  wrote fig4_fliprate.png")
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     print(f"writing figures into {OUT}/")
     fig_degree()
     fig_contradiction()
     fig_mechanism()
+    fig_fliprate()
 
 
 if __name__ == "__main__":
