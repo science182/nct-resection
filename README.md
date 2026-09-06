@@ -49,7 +49,7 @@ Nine separate results in this project looked clean and significant and were
 wrong. Each is documented below with the control that caught it. That record is
 the main thing worth taking from this repo.
 
-## The argument in three figures
+## The argument in four figures
 
 `python3 figures.py` regenerates these from the cached results.
 
