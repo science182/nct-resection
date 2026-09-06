@@ -42,6 +42,33 @@ Seven separate results in this project looked clean and significant and were
 wrong. Each is documented below with the control that caught it. That record is
 the main thing worth taking from this repo.
 
+## The argument in three figures
+
+`python3 figures.py` regenerates these from the cached results.
+
+**1. What replicated.** Deletion damage tracks node strength in both datasets,
++0.896 across 1065 HCP subjects and +0.883 in a different site, pipeline and
+parcellation. As a resection score it is largely reproducible by summing a row
+of the connectivity matrix.
+
+![deletion damage against node strength](figures/fig1_degree.png)
+
+**2. What did not.** The same 1065 brains under two standard edge weightings
+give risk maps that are uncorrelated (+0.021), and each flags a different
+network. Language parcels sit high under Fpt and unremarkable under streamline
+counts; visual parcels do the reverse. Each map on its own is reproducible
+across independent halves at +0.999.
+
+![the same brains give opposite answers](figures/fig2_contradiction.png)
+
+**3. Why, and what to do.** Stability is set by how heavy-tailed the edge weight
+distribution is, not by density. Note the colouring in the left panel: dense
+connectomes appear at both the top and the bottom, so density does not order the
+points. Compressing the tail at fixed density helps a great deal; thinning edges
+once the tail is already compressed does nothing.
+
+![stability against tail heaviness](figures/fig3_mechanism.png)
+
 ## What is new here, and what is not
 
 Most of this replicates known results. Being clear about that up front:
