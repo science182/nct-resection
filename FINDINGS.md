@@ -143,9 +143,10 @@ Most of this replicates known results, and the repository says so.
 
 Average controllability tracking node strength is documented: Gu et al. (2015)
 report r = 0.91, and the +0.896 here reproduces it. That edge weighting affects
-graph metrics is established, with its own literature; Sotiropoulos and
-colleagues' comparisons of streamline count, FA and axon-diameter weightings
-conclude that selection affects interpretation. Log-transforming skewed
+graph metrics is established, with its own literature; a 2024 Network
+Neuroscience comparison of streamline count, FA and axon-diameter weightings
+concludes that the choice affects interpretation and that no one weighting is
+superior. Log-transforming skewed
 connectome weights is already common practice. Multiverse analysis is a
 recognised methodology, including in network neuroscience.
 

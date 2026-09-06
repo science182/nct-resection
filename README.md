@@ -41,7 +41,7 @@ belongs to the correction proposed here, not to global efficiency as published.
 no sensitivity with full control, an ill-conditioned Gramian with restricted
 control, and sign violations in 44 to 66 percent of cases either way.
 
-Seven separate results in this project looked clean and significant and were
+Nine separate results in this project looked clean and significant and were
 wrong. Each is documented below with the control that caught it. That record is
 the main thing worth taking from this repo.
 
