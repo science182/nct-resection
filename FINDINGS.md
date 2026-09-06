@@ -116,13 +116,47 @@ matrix would have produced it. PageRank at +0.997 is the clearest case: hubness
 results on dense weighted connectomes are close to statements about degree, and
 saying so costs nothing and prevents an overclaim.
 
-**3. Where the risk actually lies, and where it does not.** Raw global
-efficiency is reasonably stable across weighting conventions (+0.58), comparable
-to raw controllability (+0.57). The instability is specific to *degree-corrected*
-derivatives, which fall to +0.04 and +0.29. So an existing raw-measure pipeline
-is not the thing at risk. The exposure is in the natural next step: correcting
-for degree in order to surface regions that plain connectivity misses. That is
-exactly where the map becomes convention-dependent.
+**3. Do not read a map correlation as conclusion stability.** Raw measures
+correlate better across weighting conventions (+0.58 for global efficiency,
++0.57 for controllability) than degree-corrected ones (+0.04 and +0.29), and an
+earlier draft of this document concluded from that raw pipelines were not at
+risk. Counting the conclusions instead shows that was too generous.
+
+Taking the statement types that appear in published work and asking how often
+each changes when only the weighting changes (`run_fliprate.py`):
+
+    HCP, raw deletion damage        top hub changes            83% of pairs
+                                    top-10 overlap             54%
+                                    clear-cut pairwise flips   21.1%
+                                    dominant network changes   83% of pairs
+
+    HCP, degree-corrected           top hub changes           100% of pairs
+                                    top-10 overlap             11%
+                                    clear-cut pairwise flips   35.7%
+                                    dominant network changes   83% of pairs
+
+    Lausanne, raw                   top hub changes            83% of pairs
+                                    top-10 overlap             68%
+                                    clear-cut pairwise flips    7.6%
+
+    Lausanne, degree-corrected      top hub changes            83% of pairs
+                                    top-10 overlap             38%
+                                    clear-cut pairwise flips   13.0%
+
+A Spearman of +0.58 sounds tolerable and coexists with the single most central
+parcel changing in five comparisons out of six, and with the most
+over-represented network changing just as often. Rank correlation is not the
+quantity anyone draws a conclusion from, and reporting it in place of the
+conclusion understates how much is contingent.
+
+Degree correction makes this worse rather than causing it. The exposure is
+therefore broader than the earlier draft claimed: it applies to raw deletion
+rankings and hub identification, not only to degree-corrected derivatives.
+
+Pairwise flips are counted over "clear-cut" pairs only, meaning the first map
+separates the two parcels by more than half its interquartile spread. Reversing
+a near-tie is not a real disagreement, and counting all pairs inflates the
+figure by roughly a third.
 
 **4. Report comparisons with a robustness grade, not a point estimate.** The
 clinical question is usually whether corridor A is safer than corridor B, and

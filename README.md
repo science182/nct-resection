@@ -32,10 +32,14 @@ almost perfectly degree (r > 0.99), leaving no non-degree component to test,
 and nothing is enriched at all. The finding is a property of the weighting
 convention, not of anatomy.
 
-**Where the instability is not.** Raw global efficiency and raw controllability
-both hold up reasonably across four weighting conventions, +0.58 and +0.57.
-It is the degree-corrected maps that collapse, +0.04 and +0.29. The problem
-belongs to the correction proposed here, not to global efficiency as published.
+**Where the instability is, corrected.** Raw global efficiency and raw
+controllability correlate better across conventions (+0.58 and +0.57) than
+degree-corrected maps (+0.04 and +0.29), and an earlier version of this file
+read that as raw pipelines being safe. Counting conclusions rather than
+correlations shows otherwise: even for raw deletion damage the top hub changes
+in 83 percent of weighting comparisons, top-10 sets overlap only 54 percent, and
+the most over-represented network changes in 83 percent. Degree correction makes
+this worse rather than causing it. See `run_fliprate.py`.
 
 **Control energy** was the remaining candidate and does not work as formulated:
 no sensitivity with full control, an ill-conditioned Gramian with restricted
