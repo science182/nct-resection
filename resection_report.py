@@ -139,6 +139,9 @@ def main():
     ap.add_argument("--grow", type=int, default=0,
                     help="grow each seed into a contiguous resection of this size")
     ap.add_argument("--max-nodes", type=int, default=400)
+    ap.add_argument("--json", metavar="PATH",
+                    help="also write the full result as JSON, for wiring into "
+                         "an existing pipeline")
     args = ap.parse_args()
 
     A = clean(load_any(args.input, log10=args.log10,
@@ -232,6 +235,43 @@ def main():
     if agree > 0.9:
         print("  The network measures are tracking degree here. Reporting the")
         print("  total connectivity removed would say the same thing.")
+
+    if args.json:
+        import json
+        payload = {
+            "input": args.input,
+            "n_parcels": int(n),
+            "tail_ratio": float(tail_ratio(A)),
+            "n_choices": int(n_choices),
+            "weightings": list(WEIGHTINGS),
+            "measures": list(MEASURES),
+            "strength_agreement": float(agree),
+            "candidates": [
+                {
+                    "parcels": sorted(int(p) for p in c),
+                    "label": labels[i],
+                    "mean_rank": float(mean_r[i]),
+                    "rank_min": int(min_r[i]),
+                    "rank_max": int(max_r[i]),
+                    "rank_sd": float(sd_r[i]),
+                    "damage": {f"{w}|{m}": float(scores[(w, m)][i])
+                               for (w, m) in scores},
+                }
+                for i, c in enumerate(candidates)
+            ],
+            "comparisons": [
+                {
+                    "a": labels[r["a"]], "b": labels[r["b"]],
+                    "safer": r["label_safer"],
+                    "agreement": float(r["share"]),
+                    "grade": r["grade"],
+                }
+                for r in rows
+            ],
+        }
+        with open(args.json, "w") as fh:
+            json.dump(payload, fh, indent=2)
+        print(f"\n  wrote {args.json}")
 
 
 if __name__ == "__main__":

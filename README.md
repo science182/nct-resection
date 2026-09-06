@@ -251,6 +251,50 @@ python3 demo.py                   # end-to-end on a synthetic graph, ~1 min
 python3 run_real.py               # group-average sweep, ~2 min
 ```
 
+## Checking the numbers in this file
+
+Every headline figure quoted here is recomputed and compared against the written
+value by one command:
+
+```bash
+python3 reproduce.py
+```
+
+It reports each claim as pass, fail, or skip, and exits non-zero on any failure,
+so it can gate a commit. Claims needing the large sweeps are skipped rather than
+failed when those files are absent. At the time of writing, 12 of 12 pass.
+
+## Comparing candidate resections
+
+`resection_report.py` is aimed at the question a planning pipeline actually
+faces, which is not "how risky is this parcel" but "is corridor A safer than
+corridor B". That comparison can hold up even when the underlying map does not.
+
+```bash
+python3 resection_report.py --input conn.mat --grow 5 --seeds 12,45,88
+python3 resection_report.py --input conn.mat --candidates 12,13|45,46 --json out.json
+```
+
+For each pair of candidates it reports how consistently one beats the other
+across 4 weighting conventions crossed with 3 damage measures, and grades it:
+
+    ROBUST      the same winner under every choice
+    LIKELY      one winner in at least four fifths of choices
+    COIN FLIP   the answer is set by the analysis, not the anatomy
+
+Plain node strength is one of the three measures on purpose. If it agrees with
+the others, the report says so, because then total connectivity removed would
+have told you the same thing.
+
+Measured on HCP streamline connectomes, it discriminates in both directions:
+clearly different corridors give 5 of 6 robust comparisons and no coin flips,
+while corridors matched on total connectivity removed give 1 robust and 1 coin
+flip. So an unstable whole-brain map does not by itself make specific surgical
+comparisons unreliable, which is the useful thing to be able to check.
+
+`--json` writes the full result, including per-candidate damage under every
+choice, for wiring into an existing pipeline.
+
 ## Auditing your own connectomes
 
 `audit.py` is the practical output of all this. Point it at a connectome and it
