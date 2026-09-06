@@ -219,9 +219,42 @@ two-weighting test could not be run in the second dataset.
 pip install -r requirements.txt
 python3 download_data.py          # core inputs, ~13 MB
 python3 test_nct.py               # 16 checks, ~10s
+python3 test_audit.py             # 22 checks on the audit tool, ~20s
 python3 demo.py                   # end-to-end on a synthetic graph, ~1 min
 python3 run_real.py               # group-average sweep, ~2 min
 ```
+
+## Auditing your own connectomes
+
+`audit.py` is the practical output of all this. Point it at a connectome and it
+reports whether a deletion-based map from that data can be trusted, and what to
+do if not.
+
+```bash
+python3 audit.py --input yourdata.mat
+python3 audit.py --input data/averageConnectivity_Fpt.csv --log10
+```
+
+It answers three questions about your dataset rather than about the method:
+
+1. **How much of the deletion damage is just node strength?** If the ranking is
+   degree, summing a row of the matrix reproduces it and the fancier measure
+   earns nothing.
+2. **Does the map survive a change of weighting convention?** Measured directly
+   by rebuilding it under four conventions and correlating the results.
+3. **What fixes it?** Solved for your data, not assumed. It checks whether a log
+   transform actually compresses your weights, and if not, finds the power
+   transform that does.
+
+On the two datasets here it discriminates as it should: HCP streamline counts
+come back at +0.204 ("a map from any single weighting is not trustworthy on its
+own"), and the Lausanne connectomes at +0.669 ("report results under more than
+one"). For HCP it recommends `w ** 0.35`, which keeps all 129,240 edges, over
+thresholding, which would discard 89 percent of them to achieve less.
+
+Accepts `.npy`, `.csv`, and MATLAB `.mat` including nested structs and
+multi-scale releases. `--max-nodes` picks which parcellation scale to audit when
+a file holds several.
 
 For the per-subject and weighting analyses, fetch the large inputs first:
 
