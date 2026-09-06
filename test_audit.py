@@ -210,5 +210,52 @@ def main():
     return 0
 
 
+# --- resection_report checks -------------------------------------------------
+
+def test_ties_are_not_wins():
+    """Identical candidates must grade IDENTICAL, not ROBUST.
+
+    Growing from different seeds can converge on the same corridor. Counting
+    only strict wins made every tie a win for whichever candidate came second,
+    so two identical resections were reported as a reliable difference.
+    """
+    from resection_report import grade_pairs
+    scores = {("raw", "strength"): np.array([1.0, 1.0]),
+              ("log", "strength"): np.array([1.0, 1.0])}
+    row = grade_pairs(scores, [[1], [1]])[0]
+    check("identical candidates grade IDENTICAL", row["grade"] == "IDENTICAL",
+          f"got {row['grade']} at {row['share']:.0%}")
+
+
+def test_grades_track_agreement():
+    from resection_report import grade_pairs
+    unanimous = {f"c{k}": np.array([1.0, 2.0]) for k in range(10)}
+    check("unanimous comparison is ROBUST",
+          grade_pairs(unanimous, [[1], [2]])[0]["grade"] == "ROBUST")
+
+    split = {f"c{k}": np.array([1.0, 2.0]) if k < 5 else np.array([2.0, 1.0])
+             for k in range(10)}
+    check("evenly split comparison is a COIN FLIP",
+          grade_pairs(split, [[1], [2]])[0]["grade"] == "COIN FLIP")
+
+    mostly = {f"c{k}": np.array([1.0, 2.0]) if k < 9 else np.array([2.0, 1.0])
+              for k in range(10)}
+    row = grade_pairs(mostly, [[1], [2]])[0]
+    check("nine of ten is LIKELY", row["grade"] == "LIKELY",
+          f"got {row['grade']} at {row['share']:.0%}")
+
+
+def test_damage_is_monotone_in_extent():
+    """Removing more tissue cannot be scored as less damaging."""
+    from resection_report import damage
+    M = heavy_tailed(40)
+    small = damage(M, [3], "strength")
+    large = damage(M, [3, 4, 5], "strength")
+    check("strength damage grows with resection size", large > small)
+    e_small = damage(M, [3], "efficiency")
+    e_large = damage(M, [3, 4, 5], "efficiency")
+    check("efficiency damage grows with resection size", e_large > e_small,
+          f"{e_small:.4g} vs {e_large:.4g}")
+
 if __name__ == "__main__":
     sys.exit(main())
