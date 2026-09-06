@@ -1,5 +1,8 @@
 # nct-resection
 
+**Short standalone write-up: [FINDINGS.md](FINDINGS.md).** The rest of this file
+is the working record, including everything that failed.
+
 Does ranking simulated brain resections by network controllability tell a
 surgeon anything that global efficiency and node degree do not already say?
 
