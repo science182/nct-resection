@@ -258,6 +258,57 @@ def _n4():
     return _native("flip", True)
 
 
+# --- figures quoted in PREPRINT.md ------------------------------------------
+
+@claim("PageRank vs node strength, group average", 0.997, 0.005,
+       needs=("data/averageConnectivity_Fpt.csv",))
+def _pr():
+    from data import load_rosen_halgren
+    from lesion import pagerank_scores
+    A = load_rosen_halgren("data/averageConnectivity_Fpt.csv")
+    return float(spearmanr(pagerank_scores(A), A.sum(axis=1))[0])
+
+
+@claim("nodal (not deletion) AC vs strength, within subject", 0.654, 0.01,
+       needs=("data/subject_profiles.npz",))
+def _nodal():
+    d = np.load("data/subject_profiles.npz")
+    ac, st = d["ac"], d["strength"]
+    return float(np.mean([spearmanr(ac[s], st[s])[0] for s in range(ac.shape[0])]))
+
+
+def _axes(kind):
+    f = np.load("data/scale_fpt_deletions.npz")
+    s_ = np.load("data/scale_streamline_deletions.npz")
+    if kind == "corrected_between":
+        a = residualize(f["d_ac"], f["strength"], "quadratic")
+        b = residualize(s_["d_ac"], s_["strength"], "quadratic")
+    elif kind == "strength_between":
+        a, b = f["strength"], s_["strength"]
+    else:
+        return float(spearmanr(f["strength"].mean(0), s_["strength"].mean(0))[0])
+    return float(np.mean([spearmanr(a[:, p], b[:, p])[0]
+                          for p in range(a.shape[1])]))
+
+
+@claim("between-subject agreement, degree-corrected", 0.059, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _ax1():
+    return _axes("corrected_between")
+
+
+@claim("between-subject agreement, node strength", 0.729, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _ax2():
+    return _axes("strength_between")
+
+
+@claim("spatial agreement, node strength", 0.870, 0.01,
+       needs=("data/scale_fpt_deletions.npz", "data/scale_streamline_deletions.npz"))
+def _ax3():
+    return _axes("strength_spatial")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)

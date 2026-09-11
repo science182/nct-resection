@@ -1,6 +1,7 @@
 # nct-resection
 
-**Short standalone write-up: [FINDINGS.md](FINDINGS.md).** The rest of this file
+**Preprint draft: [PREPRINT.md](PREPRINT.md). Short write-up: [FINDINGS.md](FINDINGS.md).**
+The rest of this file
 is the working record, including everything that failed.
 
 Does ranking simulated brain resections by network controllability tell a
