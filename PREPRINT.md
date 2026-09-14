@@ -46,6 +46,13 @@ deletion damage across four conventions, the single most central parcel and the
 most over-represented network each changed in 83 percent of comparisons, at a
 map correlation of +0.58.
 
+Nor is it confined to control measures. Across ten standard nodal centrality
+measures, restricted to monotone conventions so that binarizing cannot drive the
+result, eight of ten shared fewer than seven of their ten highest-ranked parcels
+between weightings, including betweenness (28 percent), closeness (14 percent)
+and eigenvector centrality (44 percent). Binary degree, which must be invariant
+under monotone reweighting, returned rho = +1.000 as an internal check.
+
 We conclude that reporting map correlation understates how contingent a
 conclusion is, that the relevant diagnostic is the weight distribution's tail,
 and that compressing weights is preferable to thresholding as a remedy. Two
@@ -233,7 +240,34 @@ reversed. After degree correction, the ten highest-risk parcels shared no member
 at all and 47.6 percent of clear-cut judgements reversed, which is
 indistinguishable from chance.
 
-### 3.5 Independent dataset
+### 3.5 The instability is not specific to control measures
+
+Restricting to the three monotone conventions, so that binarizing cannot be said
+to drive the result, and averaging over four subjects, we computed ten standard
+nodal centrality measures under each convention and compared their rankings.
+
+Eight of ten placed fewer than seven of their ten highest-ranked parcels in
+common: PageRank 48 percent, communicability 49 percent, strength 47 percent,
+eigenvector 44 percent, betweenness 28 percent, average controllability 47
+percent, modal controllability 8 percent, closeness 14 percent. Mean rank
+correlations ranged from +0.75 down to +0.33. Including the binary convention,
+all ten fell below 70 percent in both datasets.
+
+Betweenness, closeness and eigenvector centrality are not control-theory
+measures. They are the standard instruments of hub identification, and they are
+among the least stable in the panel.
+
+Binary degree is carried as an internal validity check. It counts which edges
+exist and must therefore be exactly invariant under monotone reweighting; it
+returns rho = +1.000 with complete top-ten overlap. Weighted clustering is the
+only substantive measure that remains stable under monotone reweighting
+(+0.958, 75 percent), and it collapses once binarizing is admitted.
+
+The recurring pattern is high correlation with low overlap. A measure can
+preserve its bulk ordering while exchanging most of the handful of regions that
+a paper would actually name.
+
+### 3.6 Independent dataset
 
 The degree result replicated (+0.883). The instability did not, in the same
 magnitude: degree-corrected map stability across conventions was +0.756 in the
@@ -244,7 +278,7 @@ correspondingly lower but not negligible: top hub changed in 83 percent of
 comparisons, top-ten overlap was 68 percent, and 7.6 percent of clear-cut
 judgements reversed.
 
-### 3.6 Measures that did not work
+### 3.7 Measures that did not work
 
 Minimum control energy was examined as a candidate that is not a spectral summary
 of the matrix. With full control the network barely enters: the effect of a

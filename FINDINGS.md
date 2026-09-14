@@ -110,6 +110,37 @@ Do not threshold instead. Thresholding to 11 percent density reaches only +0.64
 and discards 89 percent of the edges to get there. It works at all only because
 it compresses the tail as a side effect.
 
+**1b. This is not confined to control measures.** Running the same test on the
+nodal centrality measures that hub-identification papers report, restricted to
+the three monotone conventions so that binarizing cannot be said to do the work,
+averaged over four subjects:
+
+    measure            mean rho   top-10 overlap
+    degree              +1.000        100%     <- internal check, must be 1
+    clustering          +0.958         75%
+    pagerank            +0.747         48%
+    communicability     +0.744         49%
+    strength            +0.737         47%
+    eigenvector         +0.585         44%
+    betweenness         +0.550         28%
+    avg controllability +0.430         47%
+    mod controllability +0.357          8%
+    closeness           +0.333         14%
+
+Eight of ten measures put fewer than seven of their top ten parcels in common
+across weightings. Betweenness, closeness and eigenvector centrality are not
+control-theory measures; they are the standard tools of hub identification.
+Including the binary convention, all ten fall below 70 percent in both datasets.
+
+Binary degree is carried as an internal validity check. It counts which edges
+exist, so it must be exactly invariant under monotone reweighting, and it is
+(+1.000, 100 percent). It is not expected to hold once binarizing is included,
+since that convention removes edges.
+
+The pattern to notice is again high correlation with low overlap. PageRank at
+rho = +0.747 shares fewer than half its top ten. The bulk ordering survives; the
+specific regions a paper would name do not.
+
 **2. Report node strength beside any network measure.** If a network finding
 correlates with strength above about 0.9, summing a row of the connectivity
 matrix would have produced it. PageRank at +0.997 is the clearest case: hubness
