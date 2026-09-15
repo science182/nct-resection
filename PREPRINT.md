@@ -267,7 +267,34 @@ The recurring pattern is high correlation with low overlap. A measure can
 preserve its bulk ordering while exchanging most of the handful of regions that
 a paper would actually name.
 
-### 3.6 Independent dataset
+### 3.6 The convention displaces the map further than the subject does
+
+All figures above are computed on cohort-average maps. Clinical use is per
+patient. We therefore repeated the comparison within subject and added a
+between-subject control (16 subjects).
+
+For raw deletion damage under monotone conventions, one subject's maps under two
+conventions agreed at rho = +0.580 with 52 percent top-ten overlap, while the
+cohort-mean comparison gave +0.572 and 54 percent. Averaging therefore does not
+materially inflate apparent stability, contrary to our expectation: the weighting
+effect is systematic across subjects rather than noise, so it survives averaging.
+
+The between-subject control is more informative. Under a fixed convention, maps
+from two different subjects agreed at rho = +0.839 with 65 percent overlap,
+against +0.580 and 52 percent for one subject across conventions. Degree
+corrected, the contrast is wider still: +0.706 and 38 percent between subjects
+against +0.312 and 8 percent within subject across conventions.
+
+Changing the analytic convention thus displaces the map further than changing the
+brain does. For applications that present per-patient maps, this bounds how much
+of the apparent individual specificity is attributable to the pipeline.
+
+This places a within-subject cross-convention correlation beside a
+between-subject same-convention one. These are distinct quantities, and the
+juxtaposition is a comparison rather than an identity, in the same sense that
+test-retest reliability and between-group difference are distinct.
+
+### 3.7 Independent dataset
 
 The degree result replicated (+0.883). The instability did not, in the same
 magnitude: degree-corrected map stability across conventions was +0.756 in the
@@ -278,7 +305,7 @@ correspondingly lower but not negligible: top hub changed in 83 percent of
 comparisons, top-ten overlap was 68 percent, and 7.6 percent of clear-cut
 judgements reversed.
 
-### 3.7 Measures that did not work
+### 3.8 Measures that did not work
 
 Minimum control energy was examined as a candidate that is not a spectral summary
 of the matrix. With full control the network barely enters: the effect of a

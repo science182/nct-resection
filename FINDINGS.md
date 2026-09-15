@@ -141,6 +141,45 @@ The pattern to notice is again high correlation with low overlap. PageRank at
 rho = +0.747 shares fewer than half its top ten. The bulk ordering survives; the
 specific regions a paper would name do not.
 
+**1c. The convention moves the map further than the patient does.** Every figure
+above is computed on a cohort-average map. No clinician sees a cohort average.
+Running the same comparison per subject, and adding the control that makes it
+interpretable (`run_patient_level.py`, 16 subjects):
+
+    raw deletion damage, monotone conventions
+      one patient, across weightings      rho +0.580    52% top-10 overlap
+      cohort mean, across weightings      rho +0.572    54%
+      two patients, same weighting        rho +0.839    65%
+
+    degree-corrected
+      one patient, across weightings      rho +0.312     8%
+      cohort mean, across weightings      rho +0.325    14%
+      two patients, same weighting        rho +0.706    38%
+
+Two predictions were wrong here and both are worth recording. Averaging over
+subjects was expected to inflate apparent stability substantially; it does not
+(-0.007 to +0.014 in rho), because the weighting effect is systematic rather than
+noise and every subject carries it in the same direction. So the group figures
+elsewhere in this document are not flattered by averaging, which is reassuring
+for them.
+
+The between-patient control is the more useful number. Under a fixed convention,
+two different subjects' maps agree at +0.839; one subject's maps under two
+conventions agree at +0.580. Changing the analytic convention moves the result
+further than changing the patient does.
+
+For a patient-specific planning product this is the figure that matters. If the
+preprocessing choice displaces a map more than swapping the brain does, then some
+of what presents as personalization is attributable to the pipeline. The remedy
+is the same as above, and it is cheap: fix and report the convention, and compress
+the weight distribution so the choice stops mattering so much.
+
+Caveat: 16 subjects, and the comparison places a within-subject cross-convention
+correlation beside a between-subject same-convention one. These are different
+quantities, in the same way test-retest reliability and between-group difference
+are different quantities; the comparison is standard but it is a comparison, not
+an identity.
+
 **2. Report node strength beside any network measure.** If a network finding
 correlates with strength above about 0.9, summing a row of the connectivity
 matrix would have produced it. PageRank at +0.997 is the clearest case: hubness
