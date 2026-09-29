@@ -264,7 +264,7 @@ def _n4():
        needs=("data/averageConnectivity_Fpt.csv",))
 def _pr():
     from data import load_rosen_halgren
-    from lesion import pagerank_scores
+    from nct_resection.lesion import pagerank_scores
     A = load_rosen_halgren("data/averageConnectivity_Fpt.csv")
     return float(spearmanr(pagerank_scores(A), A.sum(axis=1))[0])
 

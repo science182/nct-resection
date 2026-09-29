@@ -44,7 +44,7 @@ import h5py
 import numpy as np
 from scipy.stats import spearmanr
 
-from controllability import average_controllability, modal_controllability
+from nct_resection.controllability import average_controllability, modal_controllability
 
 MAT = "data/individualConnectivity.mat"
 CACHE = "data/subject_profiles.npz"

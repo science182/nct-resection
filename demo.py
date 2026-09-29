@@ -9,7 +9,7 @@ matrices is the entire remaining scientific step.
 
 import numpy as np
 
-from compare import summarize, sweep_resections
+from nct_resection.compare import summarize, sweep_resections
 
 
 def synthetic_connectome(n=180, n_modules=6, seed=0):

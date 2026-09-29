@@ -17,10 +17,10 @@ import h5py
 import numpy as np
 from scipy.stats import spearmanr
 
-from controllability import spectral_scale
+from nct_resection.controllability import spectral_scale
 from data import load_rosen_halgren
-from energy import apply_resection, energies_for_targets
-from lesion import global_efficiency
+from nct_resection.energy import apply_resection, energies_for_targets
+from nct_resection.lesion import global_efficiency
 from run_real import CSV, partial_spearman
 
 ORDER_MAT = "data/parcelOrder_and_networkAssignment.mat"

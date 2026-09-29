@@ -265,6 +265,22 @@ used for comparison (+0.289) is the matching derived-weighting number, not the
 Fpt-against-streamline-counts comparison, so this is like for like. The native
 two-weighting test could not be run in the second dataset.
 
+## Install
+
+The library and the two command-line tools install with pip:
+
+```bash
+pip install git+https://github.com/science182/nct-resection     # works now
+pip install nct-resection                                        # once released on PyPI
+pip install "nct-resection[mat]"                                 # adds h5py, for MATLAB v7.3 .mat files
+```
+
+That gives two commands, `nct-audit` (the same as `python3 audit.py`) and
+`nct-resection-report` (the same as `python3 resection_report.py`), and the
+`nct_resection` package for use from Python. The analysis scripts that produced
+the results below are not part of the installed package; clone the repository to
+run them.
+
 ## Running it
 
 ```bash
@@ -367,20 +383,28 @@ subject per weighting. Both checkpoint after every subject and resume.
 
 ## Files
 
-- `controllability.py` — average and modal controllability following
+The reusable code is the `nct_resection` package:
+
+- `nct_resection/controllability.py` — average and modal controllability following
   Gu et al. (2015). `delta_controllability` is the lesion-aware wrapper.
-- `energy.py` — minimum control energy for a state transition, and how much a
-  resection raises it. Also `apply_resection`, which is where the
+- `nct_resection/energy.py` — minimum control energy for a state transition, and how
+  much a resection raises it. Also `apply_resection`, which is where the
   disconnect-vs-delete choice lives.
-- `lesion.py` — contiguous resection growth, weighted global efficiency,
-  PageRank.
-- `compare.py` — ranks resections by every metric and extracts the
-  disagreement set. This is the actual output.
+- `nct_resection/lesion.py` — contiguous resection growth, weighted global
+  efficiency, PageRank.
+- `nct_resection/compare.py` — ranks resections by every metric and extracts the
+  disagreement set.
+- `nct_resection/weighting.py` — the four edge-weighting conventions and the
+  degree correction every result depends on.
+- `nct_resection/annot.py` — FreeSurfer .annot and GIFTI readers, and the real
+  HCP-MMP1 parcel adjacency built from the fsaverage surface.
+- `nct_resection/audit.py`, `nct_resection/report.py` — the two tools described above.
+
+At the top level:
+
 - `data.py` — real connectome sources and loading/validation.
-- `annot.py` — FreeSurfer .annot and GIFTI readers, and the real HCP-MMP1
-  parcel adjacency built from the fsaverage surface.
 - `demo.py` — synthetic connectome, end-to-end run.
-- `test_nct.py` — 16 checks, no pytest needed.
+- `test_nct.py` — 16 checks, no pytest needed. `test_audit.py` — 22 checks on the audit tool.
 
 Analyses, roughly in the order they should be read:
 

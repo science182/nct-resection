@@ -9,12 +9,12 @@ resections are the ones worth characterizing.
 import numpy as np
 from scipy.stats import spearmanr
 
-from controllability import (
+from .controllability import (
     average_controllability,
     delta_controllability,
     modal_controllability,
 )
-from lesion import delta_global_efficiency, grow_resection, pagerank_scores
+from .lesion import delta_global_efficiency, grow_resection, pagerank_scores
 
 
 def sweep_resections(A, size, seeds=None, adjacency=None):

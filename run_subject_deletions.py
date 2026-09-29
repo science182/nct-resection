@@ -16,8 +16,8 @@ import h5py
 import numpy as np
 from scipy.stats import spearmanr
 
-from controllability import average_controllability, spectral_scale
-from lesion import global_efficiency
+from nct_resection.controllability import average_controllability, spectral_scale
+from nct_resection.lesion import global_efficiency
 
 MAT = "data/individualConnectivity.mat"
 OUT = "data/subject_deletions.npz"

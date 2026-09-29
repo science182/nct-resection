@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nct-resection"
+dynamic = ["version"]
+description = "Node-deletion analysis of structural connectomes, with an audit of whether the resulting map survives a change of edge weighting"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Sujaal Gelle" }]
+keywords = ["connectome", "network control theory", "controllability", "neurosurgery", "resection", "graph theory"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "networkx>=3.0"]
+
+[project.optional-dependencies]
+mat = ["h5py>=3.8"]
+
+[project.scripts]
+nct-audit = "nct_resection.audit:main"
+nct-resection-report = "nct_resection.report:main"
+
+[project.urls]
+Homepage = "https://github.com/science182/nct-resection"
+Findings = "https://github.com/science182/nct-resection/blob/main/FINDINGS.md"
+
+[tool.hatch.version]
+path = "nct_resection/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nct_resection"]
+
+[tool.hatch.build.targets.sdist]
+include = ["nct_resection", "README.md", "LICENSE", "pyproject.toml"]

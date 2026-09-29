@@ -27,36 +27,12 @@ import sys
 import h5py
 import numpy as np
 
+from nct_resection.weighting import WEIGHTINGS, reweight  # noqa: F401 (re-exported)
 from run_subject_deletions import sweep_subject
 
 MAT = "data/streamlineCount.mat"
 KEY = "rawStreamlineCounts"
 OUT = "data/weighting_deletions.npz"
-WEIGHTINGS = ("raw", "log", "rownorm", "binary")
-
-
-def reweight(M, kind):
-    """M arrives symmetrized with a zero diagonal."""
-    if kind == "raw":
-        return M
-    if kind == "log":
-        return np.log10(1.0 + M)
-    if kind == "rownorm":
-        rs = M.sum(axis=1, keepdims=True)
-        rs[rs == 0] = 1.0
-        R = M / rs
-        return (R + R.T) / 2.0
-    if kind == "binary":
-        iu = np.triu_indices_from(M, k=1)
-        w = M[iu]
-        nz = w[w > 0]
-        cut = np.quantile(nz, 0.70)
-        B = (M >= cut).astype(float)
-        np.fill_diagonal(B, 0.0)
-        return B
-    raise ValueError(kind)
-
-
 def load_subject(dset, i):
     M = np.asarray(dset[i], dtype=float)
     M[~np.isfinite(M)] = 0.0

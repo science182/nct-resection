@@ -13,7 +13,7 @@ Discrete-time minimum energy for x0 -> xT in T steps:
 
 import numpy as np
 
-from controllability import normalize_adjacency, spectral_scale
+from .controllability import normalize_adjacency, spectral_scale
 
 
 def controllability_gramian(A, B, horizon):

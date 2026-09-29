@@ -16,7 +16,8 @@
 import numpy as np
 from scipy.stats import spearmanr
 
-from annot import read_annot, read_gifti_surface
+from nct_resection.annot import read_annot, read_gifti_surface
+from nct_resection.weighting import residualize  # noqa: F401 (re-exported)
 from run_energy import load_network_assignment
 from spin_test import parcel_centroids, spin_permutations
 
@@ -42,24 +43,6 @@ def parcel_geometry():
             verts[offset + p - 1] = np.sum(labels == p)
             areas[offset + p - 1] = tri_area[owner == p].sum()
     return verts, areas
-
-
-def residualize(damage, strength, method):
-    out = np.zeros_like(damage)
-    for s in range(damage.shape[0]):
-        x = np.argsort(np.argsort(strength[s])).astype(float)
-        y = np.argsort(np.argsort(damage[s])).astype(float)
-        if method == "rank-only":
-            out[s] = y - x
-            continue
-        cols = [np.ones_like(x), x]
-        if method == "quadratic":
-            cols.append(x ** 2)
-        elif method == "cubic":
-            cols.extend([x ** 2, x ** 3])
-        design = np.column_stack(cols)
-        out[s] = y - design @ np.linalg.lstsq(design, y, rcond=None)[0]
-    return out
 
 
 def language_enrichment(score, asg, perms):

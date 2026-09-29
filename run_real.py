@@ -15,13 +15,13 @@ appears at one threshold, that is a finding about the threshold, not the brain.
 import numpy as np
 from scipy.stats import spearmanr
 
-from controllability import (
+from nct_resection.controllability import (
     average_controllability,
     modal_controllability,
     spectral_scale,
 )
 from data import load_rosen_halgren
-from lesion import global_efficiency, pagerank_scores
+from nct_resection.lesion import global_efficiency, pagerank_scores
 
 CSV = "data/averageConnectivity_Fpt.csv"
 

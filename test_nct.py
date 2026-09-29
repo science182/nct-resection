@@ -10,7 +10,7 @@ import sys
 
 import numpy as np
 
-from controllability import (
+from nct_resection.controllability import (
     average_controllability,
     delta_controllability,
     modal_controllability,
@@ -18,13 +18,13 @@ from controllability import (
     spectral_scale,
 )
 from demo import synthetic_connectome
-from energy import (
+from nct_resection.energy import (
     apply_resection,
     controllability_gramian,
     delta_control_energy,
     minimum_control_energy,
 )
-from lesion import grow_resection, pagerank_scores
+from nct_resection.lesion import grow_resection, pagerank_scores
 
 FAILURES = []
 

@@ -38,7 +38,7 @@ from scipy.linalg import expm
 from scipy.sparse.csgraph import shortest_path
 from scipy.stats import spearmanr
 
-from controllability import average_controllability, modal_controllability
+from nct_resection.controllability import average_controllability, modal_controllability
 from run_weightings import WEIGHTINGS, reweight
 
 TOP_N = 10
@@ -183,7 +183,7 @@ def run(label, loader, n_subjects=4, conventions=WEIGHTINGS):
 
 
 def main():
-    from audit import clean, load_any
+    from nct_resection.audit import clean, load_any
 
     hcp_all = None
     lau_all = None

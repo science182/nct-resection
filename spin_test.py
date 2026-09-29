@@ -20,7 +20,7 @@ nearest-neighbour matching that lets one parcel absorb several others.
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
-from annot import read_annot, read_gifti_surface
+from nct_resection.annot import read_annot, read_gifti_surface
 
 
 def parcel_centroids(hemi, surf):

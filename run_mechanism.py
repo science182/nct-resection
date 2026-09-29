@@ -38,7 +38,7 @@ import h5py  # noqa: E402
 import numpy as np  # noqa: E402
 from scipy.stats import spearmanr  # noqa: E402
 
-from controllability import average_controllability, spectral_scale  # noqa: E402
+from nct_resection.controllability import average_controllability, spectral_scale  # noqa: E402
 from data import threshold_edges  # noqa: E402
 from run_confounds import residualize  # noqa: E402
 from run_weightings import WEIGHTINGS, reweight  # noqa: E402

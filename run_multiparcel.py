@@ -14,14 +14,14 @@ resections are anatomically contiguous.
 import numpy as np
 from scipy.stats import spearmanr
 
-from annot import build_hcp_mmp1_adjacency
-from controllability import (
+from nct_resection.annot import build_hcp_mmp1_adjacency
+from nct_resection.controllability import (
     average_controllability,
     modal_controllability,
     spectral_scale,
 )
 from data import load_rosen_halgren
-from lesion import global_efficiency, grow_resection
+from nct_resection.lesion import global_efficiency, grow_resection
 from run_real import CSV, partial_spearman
 
 

@@ -23,7 +23,7 @@ import tempfile
 import numpy as np
 import scipy.io as sio
 
-from audit import (
+from nct_resection.audit import (
     _from_mat,
     _parcel_count,
     _square_numeric,
@@ -219,7 +219,7 @@ def test_ties_are_not_wins():
     only strict wins made every tie a win for whichever candidate came second,
     so two identical resections were reported as a reliable difference.
     """
-    from resection_report import grade_pairs
+    from nct_resection.report import grade_pairs
     scores = {("raw", "strength"): np.array([1.0, 1.0]),
               ("log", "strength"): np.array([1.0, 1.0])}
     row = grade_pairs(scores, [[1], [1]])[0]
@@ -228,7 +228,7 @@ def test_ties_are_not_wins():
 
 
 def test_grades_track_agreement():
-    from resection_report import grade_pairs
+    from nct_resection.report import grade_pairs
     unanimous = {f"c{k}": np.array([1.0, 2.0]) for k in range(10)}
     check("unanimous comparison is ROBUST",
           grade_pairs(unanimous, [[1], [2]])[0]["grade"] == "ROBUST")
@@ -247,7 +247,7 @@ def test_grades_track_agreement():
 
 def test_damage_is_monotone_in_extent():
     """Removing more tissue cannot be scored as less damaging."""
-    from resection_report import damage
+    from nct_resection.report import damage
     M = heavy_tailed(40)
     small = damage(M, [3], "strength")
     large = damage(M, [3, 4, 5], "strength")
