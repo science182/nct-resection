@@ -9,55 +9,33 @@ Code, data acquisition and verification: https://github.com/science182/nct-resec
 
 ## Abstract
 
-Node-deletion analyses rank brain regions by how much removing them degrades a
-network measure, and are used to reason about which tissue is safe to resect.
-Such analyses require an edge-weighting convention, a choice usually reported in
-a single clause of a methods section. We asked how much that choice determines
-the result.
-
+Node-deletion analyses rank brain regions by how much their removal degrades a
+network measure, and they are increasingly used to reason about which tissue can
+be resected safely. Every such analysis rests on a choice of edge-weighting
+convention, a decision that is usually reported in a single clause of the
+methods. Here we asked how much of the final conclusion that choice determines.
 Using 1065 Human Connectome Project subjects parcellated into 360 regions, we
-computed deletion damage under average controllability, global efficiency,
-PageRank and node strength. Deletion damage was largely a restatement of node
-degree: average controllability tracked node strength at rho = +0.896 within
-subject, PageRank at +0.997, global efficiency at +0.539. This replicates a
-known spatial correlation.
-
-Correcting damage for degree produces a map that is highly reproducible within a
-weighting convention and incompatible across conventions. Under fractional
+found that deletion damage was largely a restatement of node degree (i.e., the
+total connectivity of a region): average controllability tracked node strength
+at rho = +0.896 within subject, and PageRank at +0.997. Once damage was
+corrected for degree, the resulting maps were highly reproducible within a
+weighting convention yet incompatible across conventions. Under fractional
 probability weighting the corrected map concentrated on left perisylvian
-language cortex (9 of the top 36 parcels against 2.3 expected, spin test
-p = 0.005); under raw streamline counts, on the same brains, it concentrated on
-ventromedial visual cortex (25 of 36 against 6.0, p = 0.008) with zero language
-parcels. The two maps correlate at +0.021 while each reproduces across
-independent halves of the cohort at +0.999.
-
-Separating tail heaviness from density on a factorial grid, map stability
-tracked log tail ratio at rho = -0.917 while density contributed little once the
-tail was known. Compressing the weight distribution at full density raised
-stability from +0.319 to +0.843; thinning edges at an already-compressed tail
-did not help.
-
-At the level of conclusions rather than correlations, the cost is substantial.
-Comparing the two native weightings, the ten highest-risk parcels shared 43
-percent of members for raw damage and none at all after degree correction, and
-clear-cut pairwise risk judgements reversed in 29.6 and 47.6 percent of cases
-respectively. This is not confined to degree-corrected derivatives: for raw
-deletion damage across four conventions, the single most central parcel and the
-most over-represented network each changed in 83 percent of comparisons, at a
-map correlation of +0.58.
-
-Nor is it confined to control measures. Across ten standard nodal centrality
-measures, restricted to monotone conventions so that binarizing cannot drive the
-result, eight of ten shared fewer than seven of their ten highest-ranked parcels
-between weightings, including betweenness (28 percent), closeness (14 percent)
-and eigenvector centrality (44 percent). Binary degree, which must be invariant
-under monotone reweighting, returned rho = +1.000 as an internal check.
-
-We conclude that reporting map correlation understates how contingent a
-conclusion is, that the relevant diagnostic is the weight distribution's tail,
-and that compressing weights is preferable to thresholding as a remedy. Two
-open-source tools implement the diagnostic and a robustness-graded comparison of
-candidate resections.
+language cortex, whereas under raw streamline counts, in the same brains, it
+concentrated on ventromedial visual cortex; the two maps correlated at +0.021,
+while each reproduced across independent halves of the cohort at +0.999. On a
+factorial grid that separated the shape of the weight distribution from graph
+density, stability tracked the heaviness of the distribution's tail
+(rho = -0.917), and compressing that tail at full density raised stability from
++0.319 to +0.843. At the level of the conclusions a paper would actually report,
+the cost was substantial: between the two native weightings, the ten
+highest-risk parcels shared no members after degree correction, and comparable
+instability appeared in standard centrality measures such as betweenness and
+closeness. We therefore propose that the tail of the weight distribution be
+treated as a diagnostic, that weights be compressed rather than thresholded, and
+that conclusions, rather than map correlations, be reported. Two open-source
+tools implement the diagnostic and a robustness-graded comparison of candidate
+resections.
 
 ---
 
@@ -66,347 +44,416 @@ candidate resections.
 Structural connectomes derived from diffusion tractography are increasingly used
 to reason about surgical risk. A common design removes a region, or a contiguous
 set of regions, recomputes a network measure, and ranks candidate resections by
-the resulting damage [1]. Related work identifies hub regions by centrality and
-argues that damage to them carries disproportionate cost [2].
+the damage that follows<sup>1</sup>. Related work identifies hub regions through
+centrality measures and argues that injury to them carries a disproportionate
+cost<sup>2</sup>. The appeal of this approach is easy to see: if a network model
+could anticipate which removals most disrupt brain-wide communication, it could
+help inform where a surgeon operates.
 
-Every such analysis requires a decision about what an edge weight means.
-Tractography can be summarized as a raw streamline count, as a fraction of
-streamlines seeded, as a density normalized by region size and streamline
-length, or as a diffusion scalar. These are different measurements, not
-rescalings of one another, and comparisons of weighting schemes have concluded
-that the choice affects interpretation without one being superior [3].
+Every such analysis, however, requires a prior decision about what an edge
+weight means. Tractography can be summarized as a raw count of streamlines, as
+the fraction of streamlines seeded from one region that reach another, as a
+density normalized by region size and streamline length, or as a diffusion
+scalar. These are distinct measurements rather than rescalings of one another,
+and comparisons of weighting schemes have concluded that the choice shapes
+interpretation without any single scheme being superior<sup>3</sup>.
 
-Separately, network control theory has been applied to connectomes, and average
-controllability is known to correlate strongly with weighted degree [4]. A
-protocol paper for these methods names variability in edge-weight distributions
-across preprocessing pipelines as a limitation, without quantifying it [5].
+In parallel, network control theory has been applied to connectomes. Average
+controllability (i.e., the ease with which input to a region can drive the
+network into nearby states) is known to correlate strongly with weighted
+degree<sup>4</sup>, and a protocol paper for these methods names variability in
+edge-weight distributions across preprocessing pipelines as a limitation,
+although without quantifying it<sup>5</sup>.
 
-We combined these concerns. Our question was not whether weighting matters in
-principle, which is established, but how much of a specific, clinically framed
-conclusion it determines in practice, and whether the sensitivity can be
-predicted from a property of the data before any analysis is run.
+We brought these two concerns together. We began from the working hypothesis
+that controllability-based deletion damage carries information beyond degree.
+The results did not support that hypothesis in the form we expected, and they
+led instead to a second question. Our aim was not to show that weighting matters
+in principle, which is already established, but to measure how much of a
+specific and clinically framed conclusion it determines in practice, and to ask
+whether that sensitivity can be predicted from a property of the data before any
+analysis is run.
 
 ## 2. Methods
 
 ### 2.1 Data
 
-Primary analyses used the connectomes of Rosen and Halgren [6]: 1065 Human
-Connectome Project subjects, HCP-MMP1 parcellation, 360 cortical parcels,
-released in two native weightings. Fpt is the fraction of streamlines seeded
-from a parcel that reach a target; the raw streamline count file reports counts
-directly. Subject ordering was verified identical between the two files before
-any paired comparison.
+Primary analyses used the connectomes released by Rosen and Halgren<sup>6</sup>,
+comprising 1065 Human Connectome Project subjects parcellated with HCP-MMP1 into
+360 cortical parcels and provided in two native weightings. Fpt denotes the
+fraction of streamlines seeded from a parcel that reach a given target, whereas
+the second file reports raw streamline counts directly. Before any paired
+comparison, we verified that subject ordering was identical between the two
+files.
 
-Independent replication used 70 subjects from a Lausanne-atlas release [7], at
-scale 219, differing in site, acquisition, tractography pipeline, parcellation,
-edge-weight definition (fiber density normalized by streamline length and region
-surface area), and density (0.111 against 1.000).
+Independent replication used 70 subjects from a Lausanne-atlas
+release<sup>7</sup> at scale 219. This dataset differs from the first in site,
+acquisition, tractography pipeline, parcellation, edge-weight definition (fiber
+density normalized by streamline length and region surface area) and graph
+density (0.111 against 1.000).
 
 ### 2.2 Deletion design
 
-Following [1], parcels were removed and damage scored over the surviving
-parcels. Anatomical contiguity for multi-parcel resections used true HCP-MMP1
-adjacency derived from the fsaverage white-matter surface and the parcellation
-annotation files, giving 1050 parcel borders with mean parcel degree 5.83,
-consistent with a cortical tessellation. Adjacency was block diagonal by
-hemisphere, since cortical tissue is not contiguous across the midline.
+Following Lin et al.<sup>1</sup>, parcels were removed and damage was scored over
+the surviving parcels. For multi-parcel resections, anatomical contiguity was
+defined by the true HCP-MMP1 adjacency, which we derived from the fsaverage
+white-matter surface and the parcellation annotation files. This yielded 1050
+parcel borders with a mean parcel degree of 5.83, consistent with a cortical
+tessellation. Adjacency was block diagonal by hemisphere, since cortical tissue
+is not contiguous across the midline and a resection therefore cannot grow from
+one hemisphere into the other along the surface.
 
 ### 2.3 Network measures
 
-Average and modal controllability follow [4], computed from the eigendecomposition
-of the adjacency matrix normalized to a target spectral radius. Global efficiency
-is the weighted form, with edge weights inverted to distances. PageRank and node
-strength are standard.
+Average and modal controllability were computed as described by Gu et
+al.<sup>4</sup>, from the eigendecomposition of the adjacency matrix normalized
+to a target spectral radius. Global efficiency was computed in its weighted
+form, with edge weights inverted to distances, and PageRank and node strength
+were computed in the standard way.
 
-Two normalization details materially affect lesion analyses. First, both networks
-must be normalized by the *intact* network's spectral scale: normalizing each by
-its own largest singular value means removing a hub lowers the denominator,
-inflating the lesioned network's controllability and making hub resection appear
-protective. Second, the target spectral radius must suit the weight units. The
-conventional additive form assumes streamline counts, and applied to probability
+Two details of normalization materially affect lesion analyses, and each
+produced a spurious result before it was identified. First, the intact and
+lesioned networks must both be normalized by the spectral scale of the intact
+network. If each network is instead normalized by its own largest singular
+value, removing a hub lowers the denominator, inflates the controllability of
+the lesioned network, and makes hub resection appear protective. Second, the
+target spectral radius must suit the units of the weights. The conventional
+additive form assumes streamline counts, and when it is applied to probability
 weights it places the system in a regime where average and modal controllability
-both linearize around the same quantity and become mutually redundant.
+both linearize around the same quantity and become, in effect, redundant.
 
 ### 2.4 Degree correction
 
 Removing a parcel removes exactly its own strength, so every raw damage measure
-inherits degree by construction. The corrected score is the residual of damage on
-within-subject strength rank. Results were invariant to the form of that
-correction: linear, quadratic, cubic and rank-only fits gave identical network
-enrichment at p ~ 0.01, and a regression-free comparison restricted to
-strength-matched parcel pairs agreed.
+inherits degree by construction. We therefore defined a corrected score as the
+residual of damage on within-subject strength rank. The results were invariant
+to the form of this correction: linear, quadratic, cubic and rank-only fits
+yielded identical network enrichment at p ~ 0.01, and a regression-free
+comparison restricted to strength-matched pairs of parcels agreed.
 
 ### 2.5 Weighting conventions
 
-Four conventions were derived from a single matrix, holding tractography fixed:
-raw, log10(1 + w), row-normalized, and binarized at the top 30 percent of edges.
-Because these are derived, the two *native* weightings of the same subjects, Fpt
-against raw streamline counts, were compared separately as the stronger test.
+To hold tractography fixed while varying only the convention, we derived four
+weightings from a single matrix: raw, log10(1 + w), row-normalized, and
+binarized at the top 30 percent of edges. Because these conventions are derived
+rather than measured, we treated the comparison between the two native
+weightings of the same subjects (Fpt against raw streamline counts) separately,
+as the stronger test.
 
-To separate tail heaviness from density, base connectomes were built on a
-factorial grid before any convention was applied: weights raised to a power alpha
-in {1.0, 0.5, 0.25}, which compresses the distribution without removing an edge,
-crossed with thinning to densities {1.0, 0.30, 0.11}, which removes edges while
-leaving surviving weights untouched. Tail heaviness is summarized as the ratio of
-the maximum to the median nonzero off-diagonal weight.
+To separate the heaviness of the weight distribution from graph density, we
+built base connectomes on a factorial grid before applying any convention.
+Weights were raised to a power alpha in {1.0, 0.5, 0.25}, which compresses the
+distribution without removing any edge, and this was crossed with thinning to
+densities of {1.0, 0.30, 0.11}, which removes edges while leaving the surviving
+weights untouched. We summarized tail heaviness as the tail ratio (i.e., the
+maximum divided by the median nonzero off-diagonal weight).
 
 ### 2.6 Conclusion types
 
-Five statement types were scored for stability, chosen to match what is
-routinely reported: the identity of the top-ranked parcel; the membership of the
-top ten; the full rank order by Spearman correlation; pairwise judgements of the
-form "removing A is worse than removing B"; and which network is most
-over-represented among the highest-risk parcels.
+A map correlation does not by itself describe what a reader would conclude from
+a map. We therefore scored the stability of five statement types, chosen to
+match what is routinely reported: the identity of the top-ranked parcel, the
+membership of the top ten, the full rank order (by Spearman correlation),
+pairwise judgements of the form "removing A is worse than removing B", and the
+network most over-represented among the highest-risk parcels.
 
-Pairwise judgements were counted over "clear-cut" pairs only, defined as those
-the first map separates by more than half its interquartile spread. Reversing a
-near-tie is not a substantive disagreement, and counting all pairs inflates the
-reported rate by roughly a third. Both figures are reported in the code output.
+Pairwise judgements were counted over clear-cut pairs only, defined as pairs
+that the first map separates by more than half of its interquartile spread.
+Reversing a near-tie is not a substantive disagreement, and counting all pairs
+inflates the reported rate by roughly a third; both figures are reported in the
+code output.
 
 ### 2.7 Spatial nulls
 
-Network enrichment was tested against a spin null: 1000 random rotations of the
-map on the fsaverage sphere, with parcels matched to rotated positions by the
-Hungarian algorithm to produce genuine one-to-one permutations [8]. This
-preserves the spatial autocorrelation of the map and the geometry of the
-parcellation, and destroys only the alignment between map and anatomy. Free
-label shuffling is anti-conservative here, and most secondary enrichments
-significant under that null did not survive the spin test.
+Network enrichment was tested against a spin null<sup>8</sup>, in which the map
+was rotated 1000 times on the fsaverage sphere and parcels were matched to their
+rotated positions with the Hungarian algorithm to produce genuine one-to-one
+permutations. This procedure preserves the spatial autocorrelation of the map
+and the geometry of the parcellation while destroying only the alignment between
+map and anatomy. Free label shuffling is anti-conservative in this setting, and
+indeed most secondary enrichments that reached significance under that null did
+not survive the spin test.
 
 ## 3. Results
 
-### 3.1 Deletion damage is largely node degree
+### 3.1 Deletion damage is largely a restatement of node degree
 
-Across 1065 subjects, average controllability deletion damage correlated with
-node strength at rho = +0.896 (sd 0.018) within subject. In the independent
-Lausanne dataset, with a different pipeline and parcellation, the same
-correlation was +0.883. PageRank correlated with strength at +0.997; global
-efficiency, the least degree-dependent of the measures examined, at +0.539.
+Across 1065 subjects, deletion damage measured by average controllability
+correlated with node strength at rho = +0.896 (sd 0.018) within subject
+(Figure 1). In the independent Lausanne dataset, despite a different pipeline
+and parcellation, the same correlation was +0.883. PageRank correlated with
+strength at +0.997, and global efficiency, the least degree-dependent of the
+measures we examined, at +0.539. This relationship held for single-parcel and
+for anatomically contiguous multi-parcel resections, both at group level and
+within individual subjects.
 
-This held for single-parcel and for anatomically contiguous multi-parcel
-resections, at group level and per subject. The spatial correlation between
-average controllability and weighted degree is documented [4]; the contribution
-here is that the deletion delta inherits it more strongly than the nodal measure
-does (+0.896 against +0.654), which follows from removing a parcel removing
-exactly its own strength.
+The spatial correlation between average controllability and weighted degree has
+been documented previously<sup>4</sup>. What we add is that the deletion delta
+inherits this correlation more strongly than the nodal measure itself does
+(+0.896 against +0.654). In retrospect this is expected, because removing a
+parcel removes exactly its own strength, but it implies that a
+controllability-based ranking of resections is, to a first approximation, a
+ranking by how much connectivity each resection removes.
 
-### 3.2 Two native weightings give incompatible maps
+![Deletion damage against node strength](figures/fig1_degree.png)
 
-Degree-corrected maps were highly reproducible within a convention. Splitting the
-cohort into independent halves of 532 and 533 subjects, the mean corrected map
-of one half correlated with the other at +0.999.
+**Figure 1.** Deletion damage tracks node strength. Average-controllability
+deletion damage against node strength for each parcel in the HCP-MMP1
+connectomes (1065 subjects, left) and the independent Lausanne 219 connectomes
+(70 subjects, right). Within-subject Spearman correlations are +0.896 and
++0.883. Horizontal axes are logarithmic.
 
-Across the two native conventions, on the same subjects, the corrected maps
-correlated at +0.021. Under Fpt, 9 of the 36 highest-risk parcels belonged to the
-language network against 2.3 expected (spin test p = 0.005), and none to the
-visual network. Under raw streamline counts, 25 of 36 belonged to the visual
-network against 6.0 expected (p = 0.008), and none to language. Both survive
-Bonferroni correction across ten networks. At most one can reflect anatomy.
+### 3.2 Two native weightings of the same brains yield incompatible maps
 
-Testing both axes of comparison, the corrected measure failed on each: spatial
-agreement between conventions +0.021, between-subject agreement +0.059 against a
-subject-shuffled null of -0.008, with 149 of 360 parcels negative. Node strength,
-by contrast, was stable on both axes (+0.870 and +0.729).
+Degree-corrected maps were highly reproducible within a convention. When the
+cohort was split into independent halves of 532 and 533 subjects, the mean
+corrected map of one half correlated with that of the other at +0.999.
 
-### 3.3 Tail heaviness, not density, determines stability
+Across the two native conventions, however, the corrected maps of the same
+subjects correlated at only +0.021 (Figure 2). Under Fpt weighting, 9 of the 36
+highest-risk parcels belonged to the language network, against 2.3 expected by
+chance (spin test p = 0.005), and none belonged to the visual network. Under raw
+streamline counts, 25 of the 36 belonged to the visual network, against 6.0
+expected (p = 0.008), and none to the language network. Both enrichments survive
+Bonferroni correction across ten networks. Since the two maps describe the same
+brains, at most one of them can reflect anatomy.
 
-On the factorial grid, map stability across conventions tracked log tail ratio at
-rho = -0.917, while density tracked it at -0.211 and contributed a partial
-correlation of +0.267 once the tail was known. Compressing the tail at full
-density raised stability from +0.319 to +0.843, exceeding what the sparser
-Lausanne connectomes achieve. Thinning edges at an already-compressed tail
-changed stability by -0.070, that is, not at all.
+Because the correlation with strength has been argued to be a spatial rather
+than a between-subject property<sup>5</sup>, we tested both axes. The corrected
+measure failed on each: spatial agreement between conventions was +0.021, and
+between-subject agreement was +0.059, against a subject-shuffled null of -0.008,
+with 149 of 360 parcels showing negative agreement. Node strength, by contrast,
+was stable on both axes (+0.870 and +0.729).
 
-Cells with matched tail ratios but very different densities agreed closely: tail
-193 at density 0.11 gave +0.638, tail 94 at density 1.00 gave +0.629. An earlier
-analysis varying only density appeared to show density as the cause; that sweep
-confounded the two, since thresholding discards the smallest weights and thereby
-compresses the tail as a side effect.
+![The same brains give opposite answers](figures/fig2_contradiction.png)
 
-### 3.4 What the choice costs
+**Figure 2.** Two native weightings of the same brains give incompatible
+degree-corrected maps. Left: each parcel's degree-corrected risk score under
+fractional probability (Fpt) weighting against raw streamline counts, 1065
+subjects (Spearman +0.021). Language-network parcels are shown in red and
+visual-network parcels in blue. Right: language and visual parcels among the 36
+highest-risk parcels under each weighting. Dotted lines mark chance (2.3
+language, 6.0 visual).
 
-Correlations understate the instability. For raw deletion damage across four
-conventions in HCP, the top-ranked parcel changed in 83 percent of comparisons,
-top-ten sets overlapped 54 percent, clear-cut pairwise judgements reversed 21.1
-percent of the time, and the most over-represented network changed in 83 percent
-of comparisons. This occurred at a mean map correlation of +0.58.
+### 3.3 The tail of the weight distribution, not density, determines stability
 
-After degree correction the same figures were 100 percent, 11 percent, 35.7
-percent and 83 percent.
+On the factorial grid, map stability across conventions tracked the log tail
+ratio at rho = -0.917 (Figure 3). Density tracked stability at only -0.211 and
+contributed a partial correlation of +0.267 once the tail was known. Compressing
+the tail at full density raised stability from +0.319 to +0.843, exceeding what
+the sparser Lausanne connectomes achieve, whereas thinning edges at an
+already-compressed tail changed stability by -0.070, that is, not at all. Cells
+with matched tail ratios but very different densities agreed closely: a tail
+ratio of 193 at density 0.11 gave +0.638, and a tail ratio of 94 at density 1.00
+gave +0.629.
 
-Between the two native weightings the contrast is sharpest. For raw damage,
+We note that an earlier analysis, which varied only density, appeared to
+identify density as the cause. That sweep confounded the two factors, because
+thresholding discards the smallest weights and thereby compresses the tail as a
+side effect. The factorial design was introduced precisely to separate them.
+
+![Stability against tail heaviness](figures/fig3_mechanism.png)
+
+**Figure 3.** Tail heaviness, not density, determines stability. Left: map
+stability across weighting conventions against tail ratio (maximum over median
+nonzero weight) for the nine cells of the factorial grid; colour and marker size
+encode density. Right: change in stability from compressing the tail at fixed
+density (red) and from thinning edges at fixed tail (grey).
+
+### 3.4 What the choice of convention costs
+
+Correlations understate the instability (Figure 4). For raw deletion damage
+across the four derived conventions in HCP, the top-ranked parcel changed in 83
+percent of comparisons, top-ten sets overlapped by 54 percent, clear-cut
+pairwise judgements reversed 21.1 percent of the time, and the most
+over-represented network changed in 83 percent of comparisons. All of this
+occurred at a mean map correlation of +0.58. After degree correction, the
+corresponding figures were 100 percent, 11 percent, 35.7 percent and 83 percent.
+
+The contrast was sharpest between the two native weightings. For raw damage,
 top-ten overlap was 43 percent and 29.6 percent of clear-cut judgements
-reversed. After degree correction, the ten highest-risk parcels shared no members
-at all and 47.6 percent of clear-cut judgements reversed, which is
+reversed. After degree correction, the ten highest-risk parcels shared no
+members at all, and 47.6 percent of clear-cut judgements reversed, a rate
 indistinguishable from chance.
+
+![How often conclusions flip](figures/fig4_fliprate.png)
+
+**Figure 4.** How often a published-style conclusion changes when only the edge
+weighting changes. For each dataset and damage measure, the fraction of
+comparisons between the four derived conventions in which the top-ranked parcel,
+the top-ten set or the most over-represented network changes, and the fraction
+of clear-cut pairwise judgements that reverse. The Lausanne atlas carries no
+network labels, so dominant-network bars are absent there. The dotted line marks
+one half.
 
 ### 3.5 The instability is not specific to control measures
 
-Restricting to the three monotone conventions, so that binarizing cannot be said
-to drive the result, and averaging over four subjects, we computed ten standard
-nodal centrality measures under each convention and compared their rankings.
+To test whether this sensitivity is peculiar to network control theory, we
+computed ten standard nodal centrality measures under each convention,
+restricting the comparison to the three monotone conventions so that
+binarization could not be said to drive the result, and averaging over four
+subjects. Eight of the ten measures placed fewer than seven of their ten
+highest-ranked parcels in common across conventions: PageRank 48 percent,
+communicability 49 percent, strength 47 percent, eigenvector centrality 44
+percent, betweenness 28 percent, average controllability 47 percent, modal
+controllability 8 percent and closeness 14 percent. Mean rank correlations
+ranged from +0.75 down to +0.33, and when the binary convention was included,
+all ten measures fell below 70 percent in both datasets.
 
-Eight of ten placed fewer than seven of their ten highest-ranked parcels in
-common: PageRank 48 percent, communicability 49 percent, strength 47 percent,
-eigenvector 44 percent, betweenness 28 percent, average controllability 47
-percent, modal controllability 8 percent, closeness 14 percent. Mean rank
-correlations ranged from +0.75 down to +0.33. Including the binary convention,
-all ten fell below 70 percent in both datasets.
-
-Betweenness, closeness and eigenvector centrality are not control-theory
-measures. They are the standard instruments of hub identification, and they are
-among the least stable in the panel.
-
-Binary degree is carried as an internal validity check. It counts which edges
-exist and must therefore be exactly invariant under monotone reweighting; it
-returns rho = +1.000 with complete top-ten overlap. Weighted clustering is the
-only substantive measure that remains stable under monotone reweighting
-(+0.958, 75 percent), and it collapses once binarizing is admitted.
-
-The recurring pattern is high correlation with low overlap. A measure can
-preserve its bulk ordering while exchanging most of the handful of regions that
-a paper would actually name.
+Betweenness, closeness and eigenvector centrality are not control-theoretic
+measures; they are the standard instruments of hub identification, and they were
+among the least stable in the panel. Binary degree served as an internal
+validity check. Because it counts only which edges exist, it must be exactly
+invariant under monotone reweighting, and it returned rho = +1.000 with complete
+top-ten overlap. Weighted clustering was the only substantive measure that
+remained stable under monotone reweighting (+0.958, 75 percent), and it
+collapsed once binarization was admitted. The recurring pattern, in other words,
+is high correlation with low overlap: a measure can preserve its bulk ordering
+while exchanging most of the handful of regions that a paper would actually
+name.
 
 ### 3.6 The convention displaces the map further than the subject does
 
-All figures above are computed on cohort-average maps. Clinical use is per
-patient. We therefore repeated the comparison within subject and added a
-between-subject control (16 subjects).
+All of the figures above were computed on cohort-average maps, whereas clinical
+use is per patient. We therefore repeated the comparison within subjects and
+added a between-subject control, in 16 subjects. For raw deletion damage under
+monotone conventions, one subject's maps under two conventions agreed at
+rho = +0.580, with 52 percent top-ten overlap, while the cohort-mean comparison
+gave +0.572 and 54 percent. Contrary to our expectation, averaging therefore does
+not materially inflate apparent stability. The weighting effect appears to be
+systematic across subjects rather than a form of noise, and so it survives
+averaging.
 
-For raw deletion damage under monotone conventions, one subject's maps under two
-conventions agreed at rho = +0.580 with 52 percent top-ten overlap, while the
-cohort-mean comparison gave +0.572 and 54 percent. Averaging therefore does not
-materially inflate apparent stability, contrary to our expectation: the weighting
-effect is systematic across subjects rather than noise, so it survives averaging.
+The between-subject control was more informative. Under a fixed convention,
+maps from two different subjects agreed at rho = +0.839, with 65 percent overlap,
+compared with +0.580 and 52 percent for a single subject across conventions.
+After degree correction the contrast widened: +0.706 and 38 percent between
+subjects, against +0.312 and 8 percent within a subject across conventions. In
+other words, changing the analytic convention displaced the map further than
+changing the brain did. For applications that present per-patient maps, this
+suggests that part of the apparent individual specificity may be attributable to
+the pipeline rather than to the patient.
 
-The between-subject control is more informative. Under a fixed convention, maps
-from two different subjects agreed at rho = +0.839 with 65 percent overlap,
-against +0.580 and 52 percent for one subject across conventions. Degree
-corrected, the contrast is wider still: +0.706 and 38 percent between subjects
-against +0.312 and 8 percent within subject across conventions.
+We note that this juxtaposes a within-subject, cross-convention correlation with
+a between-subject, same-convention one. These are distinct quantities, and the
+comparison is not an identity, in the same sense that test-retest reliability
+and between-group difference are distinct.
 
-Changing the analytic convention thus displaces the map further than changing the
-brain does. For applications that present per-patient maps, this bounds how much
-of the apparent individual specificity is attributable to the pipeline.
+### 3.7 Replication in an independent dataset
 
-This places a within-subject cross-convention correlation beside a
-between-subject same-convention one. These are distinct quantities, and the
-juxtaposition is a comparison rather than an identity, in the same sense that
-test-retest reliability and between-group difference are distinct.
-
-### 3.7 Independent dataset
-
-The degree result replicated (+0.883). The instability did not, in the same
-magnitude: degree-corrected map stability across conventions was +0.756 in the
-Lausanne connectomes against +0.289 in HCP. This is consistent with the
-mechanism, since the Lausanne matrices have a tail ratio near 190 against roughly
-10,000 for raw HCP streamline counts. Conclusion-level flip rates were
-correspondingly lower but not negligible: top hub changed in 83 percent of
-comparisons, top-ten overlap was 68 percent, and 7.6 percent of clear-cut
-judgements reversed.
+In the Lausanne connectomes the degree result replicated (+0.883), but the
+instability did not replicate at the same magnitude: degree-corrected map
+stability across conventions was +0.756, against +0.289 in HCP. This difference
+is consistent with the proposed mechanism, since the Lausanne matrices have a
+tail ratio near 190, compared with roughly 10,000 for raw HCP streamline counts.
+Conclusion-level instability was correspondingly lower but not negligible: the
+top hub changed in 83 percent of comparisons, top-ten overlap was 68 percent, and
+7.6 percent of clear-cut judgements reversed.
 
 ### 3.8 Measures that did not work
 
-Minimum control energy was examined as a candidate that is not a spectral summary
-of the matrix. With full control the network barely enters: the effect of a
-deletion was under 0.01 percent of the intact energy, with the sign contradicting
-the model in 66 percent of cases. Restricting the driver set makes the network
-matter but leaves the Gramian near-singular, with energies of order 1e12 and sign
-violations near half. A usable formulation requires reachable target states from
-measured activation and a regularized objective.
+We also examined minimum control energy, as a candidate measure that is not
+simply a spectral summary of the matrix. With full control, the network barely
+entered the result: the effect of a deletion was under 0.01 percent of the
+intact energy, and its sign contradicted the model in 66 percent of cases.
+Restricting the set of driver nodes made the network matter, but left the
+Gramian near-singular, with energies of order 1e12 and sign violations in close
+to half of cases. We believe a usable formulation would require reachable target
+states derived from measured activation, together with a regularized objective.
 
-Modal controllability is less degree-dependent (-0.483) but at any normalization
-where lesion deltas are well conditioned it is close to a relabeling of average
-controllability.
+Modal controllability was less dependent on degree (-0.483), but at any
+normalization where lesion deltas were well conditioned it behaved as a near
+relabeling of average controllability, and so it did not provide independent
+evidence.
 
 ## 4. Discussion
 
 ### 4.1 What is and is not new
 
-The degree correlation is documented [4]. That weighting affects graph metrics is
-established [3]. Log-transforming skewed connectome weights is common practice,
-and multiverse analysis is a recognised methodology.
+Several of our findings replicate what is already known. The correlation between
+controllability and degree is documented<sup>4</sup>, the influence of weighting
+on graph metrics is established<sup>3</sup>, log-transforming skewed connectome
+weights is common practice, and multiverse analysis (i.e., systematically
+repeating an analysis across defensible choices) is a recognized methodology.
 
-There is also a standing counter-argument: that the strength correlation is
-spatial rather than between-subject, and that average controllability
-outperforms strength at out-of-sample prediction of clinical variables [5]. Our
-analyses are spatial, which is the axis where the correlation is conceded. We do
-not test prediction of an external variable and therefore do not contradict that
-result. We do show that the defence does not extend to this application, since
-the corrected measure is unstable on the between-subject axis as well.
+There is also a standing counter-argument that deserves a direct answer. Parkes
+et al.<sup>5</sup> argue that the correlation with strength is spatial rather
+than between-subject, and that average controllability outperforms strength in
+out-of-sample prediction of clinical variables. Our analyses are primarily
+spatial, which is the axis on which the correlation is conceded. We did not test
+prediction of an external variable, and our results therefore do not contradict
+theirs. They do suggest, however, that this defence does not extend to the
+deletion setting, since the corrected measure was unstable on the between-subject
+axis as well.
 
-What appears not to have been quantified is the combination reported here: the
-tail ratio as a predictor of when weighting determines the answer, applied to
-control measures, in the deletion setting, and expressed as flip rates over
-conclusion types rather than map correlations.
+What appears not to have been quantified before is the combination reported
+here: the tail ratio as a predictor of when weighting determines the answer,
+applied to control measures, in the deletion setting, and expressed as the rate
+at which reported conclusions change rather than as map correlations.
 
 ### 4.2 Recommendations
 
-**Transform the weights rather than thresholding.** Raw streamline counts have
-tail ratios near 10,000. Raising weights to approximately the 0.35 power, or a
-log transform where counts are large, brings the ratio below 30 and lifts
-stability from +0.32 to +0.84 while retaining every edge. Thresholding to 11
-percent density reaches only +0.64 and discards 89 percent of the graph.
+Our results suggest four practical recommendations. First, weights should be
+transformed rather than thresholded. Raw streamline counts have tail ratios near
+10,000; raising weights to approximately the 0.35 power, or applying a log
+transform where counts are large, brings the ratio below 30 and lifts stability
+from +0.32 to +0.84 while retaining every edge. Thresholding to 11 percent
+density, by comparison, reaches only +0.64 and discards 89 percent of the graph.
 
-**Report node strength alongside any network measure.** Where a finding
-correlates with strength above roughly 0.9, the simpler quantity would have
-produced it.
+Second, node strength should be reported alongside any network measure, because
+where a finding correlates with strength above roughly 0.9, the simpler quantity
+would have produced it.
 
-**Do not report map correlation as evidence of conclusion stability.** A
-correlation of +0.58 coexisted here with the top hub and the dominant network
-each changing in five comparisons out of six.
+Third, a map correlation should not be reported as evidence that conclusions are
+stable. In our data, a correlation of +0.58 coexisted with the top hub and the
+dominant network each changing in five comparisons out of six.
 
-**Grade comparisons rather than reporting point estimates.** Scoring a candidate
-comparison across conventions and measures separates judgements that hold under
-every choice from those that do not. In our data, clearly separated resection
-candidates gave 5 of 6 robust comparisons with no coin flips, while candidates
-matched on total connectivity removed gave 1 robust and 1 coin flip. An unstable
-whole-brain map does not by itself make every specific comparison unreliable, and
-distinguishing the two is tractable.
+Fourth, specific comparisons between candidate resections can be graded for
+robustness rather than reported as point estimates. When we scored comparisons
+across conventions and measures, clearly separated candidates gave 5 of 6 robust
+comparisons and no coin flips, whereas candidates matched on total connectivity
+removed gave 1 robust comparison and 1 coin flip. An unstable whole-brain map, in
+other words, does not by itself make every specific comparison unreliable, and
+distinguishing the two cases is tractable.
 
 ### 4.3 Limitations
 
-Two datasets, one of 70 subjects. The Lausanne release ships a single native
-weighting, so its four conventions are derived; the native two-weighting
-comparison exists only in HCP.
+This work has several limitations. It rests on two datasets, one of only 70
+subjects, and because the Lausanne release ships a single native weighting, its
+four conventions are derived, so the native two-weighting comparison exists only
+in HCP. The factorial grid used 8 subjects per cell across 9 cells, and the
+density sweep 10 to 12 per condition; these samples are adequate to estimate a
+map correlation but not to place a tight interval on it. Global efficiency was
+computed with our own implementation rather than that of the original authors,
+so comparative statements about it should be read as a flag rather than a
+result.
 
-The factorial grid used 8 subjects per cell across 9 cells, and the density sweep
-10 to 12 per condition. These are adequate to estimate a map correlation and not
-to place a tight interval on it.
-
-Global efficiency is our implementation rather than the original authors', so
-comparative statements about it should be read as a flag rather than a result.
-
-Most importantly, there is no outcome data. Whether any of these maps predicts
-post-operative deficit is the question that matters clinically and cannot be
-answered from public connectomes. It requires resection extent and
-domain-specific neuropsychological outcomes. The present work establishes only
-that the maps disagree with one another, not which, if any, is right.
+Most importantly, we had no outcome data. Whether any of these maps predicts
+post-operative deficit is the question that matters clinically, and it cannot be
+answered from public connectomes; it requires resection extent together with
+domain-specific neuropsychological outcomes. The present work establishes that
+the maps disagree with one another, not which of them, if any, is correct.
+Future studies that pair pre-operative connectomes with post-operative outcomes,
+analyzed under more than one weighting convention, are warranted to determine
+whether any deletion-based map carries clinically useful information.
 
 ## 5. Data and code availability
 
-All inputs are public. `download_data.py` retrieves them from Zenodo and
-TemplateFlow. `reproduce.py` recomputes every numerical claim in this manuscript
-and compares it against the reported value, exiting non-zero on any mismatch; 22
-of 22 currently pass. Two command-line tools, `audit.py` and
-`resection_report.py`, implement the diagnostic and the graded comparison.
-
-https://github.com/science182/nct-resection
+All inputs are public. The script `download_data.py` retrieves them from Zenodo
+and TemplateFlow, and `reproduce.py` recomputes every numerical claim in this
+manuscript, compares each against the reported value, and exits with an error on
+any mismatch; at the time of writing, 22 of 22 pass. Two command-line tools,
+`audit.py` and `resection_report.py` (installable as `nct-audit` and
+`nct-resection-report`), implement the diagnostic and the graded comparison.
+Code is available at https://github.com/science182/nct-resection.
 
 ## References
 
-[1] Lin YH, Dadario NB, Tang SJ, et al. Discernible interindividual patterns of global efficiency decline during theoretical brain surgery. Sci Rep. 2024;14:14573.
-
-[2] Yeung JT, Taylor HM, Young IM, Nicholas PJ, Doyen S, Sughrue ME. Unexpected hubness: a proof-of-concept study of the human connectome using PageRank centrality and implications for intracerebral neurosurgery. J Neurooncol. 2021;151(2):249-256.
-
-[3] Weighting the structural connectome: exploring its impact on network properties and predicting cognitive performance in the human brain. Netw Neurosci. 2024;8(1):119-137.
-
-[4] Gu S, Pasqualetti F, Cieslak M, et al. Controllability of structural brain networks. Nat Commun. 2015;6:8414.
-
-[5] Parkes L, Kim JZ, Stiso J, et al. A network control theory pipeline for studying the dynamics of the structural connectome. Nat Protoc. 2024;19(12).
-
-[6] Rosen BQ, Halgren E. A whole-cortex probabilistic diffusion tractography connectome. eNeuro. 2021;8(1):ENEURO.0416-20.2020.
-
-[7] Structural and functional connectome of 70 healthy adults, Lausanne atlas. Zenodo 2872624.
-
-[8] Alexander-Bloch AF, Shou H, Liu S, et al. On testing for spatial correspondence between maps of human brain structure and function. NeuroImage. 2018;178:540-551.
+1. Lin YH, Dadario NB, Tang SJ, et al. Discernible interindividual patterns of global efficiency decline during theoretical brain surgery. Sci Rep. 2024;14:14573.
+2. Yeung JT, Taylor HM, Young IM, Nicholas PJ, Doyen S, Sughrue ME. Unexpected hubness: a proof-of-concept study of the human connectome using PageRank centrality and implications for intracerebral neurosurgery. J Neurooncol. 2021;151(2):249-256.
+3. Weighting the structural connectome: exploring its impact on network properties and predicting cognitive performance in the human brain. Netw Neurosci. 2024;8(1):119-137.
+4. Gu S, Pasqualetti F, Cieslak M, et al. Controllability of structural brain networks. Nat Commun. 2015;6:8414.
+5. Parkes L, Kim JZ, Stiso J, et al. A network control theory pipeline for studying the dynamics of the structural connectome. Nat Protoc. 2024;19(12).
+6. Rosen BQ, Halgren E. A whole-cortex probabilistic diffusion tractography connectome. eNeuro. 2021;8(1):ENEURO.0416-20.2020.
+7. Structural and functional connectome of 70 healthy adults, Lausanne atlas. Zenodo 2872624.
+8. Alexander-Bloch AF, Shou H, Liu S, et al. On testing for spatial correspondence between maps of human brain structure and function. NeuroImage. 2018;178:540-551.
